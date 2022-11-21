@@ -41,7 +41,7 @@ public:
      * @param frame 
      * @param length 
      */
-    virtual void process_frame(uint8_t* frame, uint16_t length) = 0;
+    virtual void notify_new_frame(uint8_t* frame, uint16_t length) = 0;
 
 
 private:

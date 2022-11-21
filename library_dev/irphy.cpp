@@ -250,7 +250,7 @@ void IrPHY::put_received_data(uint8_t data)
         }
         else 
         {
-            input_buffer.put(data);
+            input_buffer.put(data ^ 0x20);
             receive_state = state_d;
         }
 
