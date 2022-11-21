@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <irphy.hpp>
 #include <ringbuffer.hpp>
-
+#include <irda.hpp>
 #include <msp430.h>
+
 
 
 IrPHY::IrPHY()
@@ -79,7 +80,7 @@ void IrPHY::deinit()
  * @param len length of data
  * @return uint16_t length of inserted data
  */
-uint16_t IrPHY::transmit(uint8_t *data, uint16_t len)
+uint16_t IrPHY::send_frame(uint8_t *data, uint16_t len)
 {
     uint16_t ii = 0;
 
@@ -173,7 +174,7 @@ bool IrPHY::is_receiving() const
 
 
 /**
- * @brief helper function to allow data insertion from ISR
+ * @brief helper function to allow data insertion from ISR, handles frame management
  * 
  * does not check if buffer is full, if so; data will be discarded.
  * 
@@ -181,7 +182,131 @@ bool IrPHY::is_receiving() const
  */
 void IrPHY::put_received_data(uint8_t data)
 {
-    input_buffer.put(data);
+    
+    /*
+        in this function, the state machine is implemented as seen in IrLAP Version 1.1 on page 118
+        to remove the Escape Sequence from the receiving frame
+    */
+
+    switch (receive_state)
+    {
+    case state_a:
+        
+        if(data == IRLAP_BOF)
+        {
+            // begin of frame: clear buffer
+            clear_intput_buffer();
+            input_buffer.put(data);
+            receive_state = state_b;
+        }
+        else{
+            // stay in here
+        }
+
+        break;
+
+    case state_b:
+
+        if(data ==IRLAP_BOF)
+        {
+            // begin of frame: clear buffer
+            clear_intput_buffer();
+            input_buffer.put(data);
+            // do not change state
+        }
+        else if(data == IRLAP_CE)
+        {
+            // do not put to input buffer
+            // just change state
+            receive_state = state_c;
+        }
+        else if(data == IRLAP_EOF)
+        {
+            // abort
+            // TODO: notify the abort
+            receive_state = state_a;
+        }
+        else
+        {
+            input_buffer.put(data);
+            receive_state = state_d;
+        }
+
+        break;
+
+    case state_c:
+
+        if(data == IRLAP_BOF)
+        {
+            // begin of frame: clear buffer
+            clear_intput_buffer();
+            input_buffer.put(data);
+            // change state to B
+            receive_state = state_b;
+        }
+        else if(data == IRLAP_EOF)
+        {
+            receive_state = state_a;
+        }
+        else 
+        {
+            input_buffer.put(data);
+            receive_state = state_d;
+        }
+
+        break;
+
+    case state_d:
+
+        if(data == IRLAP_CE)
+        {
+            // do not put to input buffer
+            // just change state
+            receive_state = state_c;
+        }
+        else if(data == IRLAP_BOF)
+        {
+            // begin of frame: clear buffer
+            clear_intput_buffer();
+            input_buffer.put(data);
+            // change state to B
+            receive_state = state_b;
+        }
+        else if(data == IRLAP_EOF)
+        {
+            input_buffer.put(data);
+
+            // notify the upper level, that a new frame is received
+            // transfer to transfer buffer
+            uint16_t i = 0;
+            while(!input_buffer.is_empty())
+            {
+                transfer_buffer[i] = input_buffer.pop();
+                i++;
+            }
+
+            // change state to A
+            receive_state = state_a;
+
+            notify_new_frame(transfer_buffer, i);
+
+            
+        }
+        else{
+            input_buffer.put(data);
+        }
+
+        break;
+    
+    default:
+        break;
+    }
+   
+    
+
+
+        
+
 }
 
 
