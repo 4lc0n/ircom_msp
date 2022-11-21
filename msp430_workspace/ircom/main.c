@@ -77,7 +77,7 @@
 //        VS Code resources: http://minkbot.blogspot.com/2019/03/vscode-and-msp430-debugging.html, https://github.com/michkrom/msp430-ansluta/tree/master/.vscode
 #include "msp430.h"
 #include <string.h>
-#include <irphy.hpp>
+#include <stdint.h>
 
 
 const char* str = "Hello World\n";
@@ -133,7 +133,7 @@ int main(void)
   // UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt || not needed in hello world
 
   
-  int i = 0; 
+  uint8_t i = 0;
 
   while (1) 
   {
@@ -166,12 +166,12 @@ void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void)
     case USCI_NONE: break;
     case USCI_UART_UCRXIFG:
       // insert received data
-      irPHY.put_received_data(UCA1RXBUF);
+      // irPHY.put_received_data(UCA1RXBUF);
       break;
     case USCI_UART_UCTXIFG: 
       // the last char was successfully transferred
       // send next data
-      irPHY.send_next_data();
+      // irPHY.send_next_data();
       break;
     case USCI_UART_UCSTTIFG: break;
     case USCI_UART_UCTXCPTIFG: break;
