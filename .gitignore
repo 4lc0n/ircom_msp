@@ -5,4 +5,4 @@
 *.hex
 
 msp430_workspace/.jxbrowser.userdata/
-msp430_workspace/.settings/
+msp430_workspace/ircom/.settings/
