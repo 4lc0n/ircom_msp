@@ -24,11 +24,13 @@ public:
     bool is_transmitting() const;
 
 
-    uint16_t receive(char *buff, uint16_t timeout_ms);
-    uint16_t receive_available() const;
-    bool is_receiving() const;
+    // not needed, as irLAP is handling things via virtual functions
+    // uint16_t receive(char *buff, uint16_t timeout_ms);
+    // uint16_t receive_available() const;
+    // bool is_receiving() const;
 
     void put_received_data(uint8_t data);
+
     void clear_intput_buffer();
 
     void send_next_data();

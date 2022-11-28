@@ -129,7 +129,7 @@ bool IrPHY::is_transmitting() const
  * @param buff buffer the received data is copied to
  * @param timeout_ms timeout until the function returns if no data available
  * @return uint16_t number of bytes received
- */
+
 uint16_t IrPHY::receive(char *buff, uint16_t timeout_ms = 0xFFFF)
 {
     uint16_t ii = 0;
@@ -154,22 +154,24 @@ uint16_t IrPHY::receive(char *buff, uint16_t timeout_ms = 0xFFFF)
     return ii;
 
 }
+ */
 
 /**
  * @brief check if data in input buffer is available
  * 
  * @return uint16_t bytes available
- */
+
 uint16_t IrPHY::receive_available() const
 {
     return input_buffer.storage_available();
 }
+ */
 
-
+/*
 bool IrPHY::is_receiving() const
 {
     return _is_receiving;
-}
+}*/
 
 
 
@@ -247,6 +249,7 @@ void IrPHY::put_received_data(uint8_t data)
         else if(data == IRLAP_EOF)
         {
             receive_state = state_a;
+            // TODO: maybe inform the upper layer of an received aborted message
         }
         else 
         {
