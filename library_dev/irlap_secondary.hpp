@@ -5,13 +5,13 @@
 #include <stdint.h>
 
 
-class IrLAP_secondary
+class IrLAP_secondary : public IrPHY
 {
 
 
 private:
 
-    IrPHY *irphy = nullptr;
+    
     
 
     struct frame{
@@ -37,7 +37,11 @@ private:
     // could also be moved to the PHY? nope?
     uint16_t calcualte_CRC(uint8_t* data, uint16_t length);
 
-    void notify_new_frame(uint8_t* frame, uint16_t length);
+    void handle_discovery_procedure(uint8_t *frame, uint16_t length);
+
+
+
+    void notify_new_frame(uint8_t* frame, uint16_t length) override;
     
 
 public:

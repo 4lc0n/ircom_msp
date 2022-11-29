@@ -1,8 +1,45 @@
 #include "irlap_secondary.hpp"
+#include "irphy.hpp"
+#include "irda.hpp"
 #include <msp430.h>
 
 
+/**
+ * @brief Construct a new IrLAP_secondary::IrLAP_secondary object
+ * 
+ */
+IrLAP_secondary::IrLAP_secondary() : IrPHY()
+{
+    
+}
 
+void IrLAP_secondary::init(){
+    IrPHY::init();
+
+    init();
+}
+
+
+/**
+ * @brief interface function for the IrPHY to let the IrLAP know, a new
+ * frame has arrived
+ * 
+ * @param frame data pointer
+ * @param length length of the frame
+ */
+void IrLAP_secondary::notify_new_frame(uint8_t* frame, uint16_t length)
+{
+    // TODO: implement
+}
+
+
+/**
+ * @brief calculates the CRC16 sum over a given data block
+ * 
+ * @param data data block to be calculated over
+ * @param length size in bytes of the data block
+ * @return uint16_t 16 bit CRC checksum over the data block
+ */
 uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
 {
     int ii = 0;
@@ -24,3 +61,4 @@ uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
     // read the output of the system
     return CRCINIRES;
 }
+

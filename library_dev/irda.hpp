@@ -12,6 +12,17 @@
 #define IRLAP_CE        (0x7D)
 
 
+
+typedef struct connection_parameter_t{
+    uint8_t baud_rate;
+    uint8_t turnaround_time;
+    uint8_t data_size;
+    uint8_t window_size;
+    uint8_t add_BOFs;
+    uint8_t turnaround_time_min;
+    uint8_t link_disconnect_threshold;
+}connection_parameter;
+
 // connection parameters
 // baud rate
 #define BAUD_PI         (0x01)
