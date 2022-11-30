@@ -11,7 +11,7 @@ class IrLAP_secondary : public IrPHY
 
 private:
 
-    
+    uint32_t device_address;                    // uinque device address
     
 
     struct frame{

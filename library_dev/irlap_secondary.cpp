@@ -16,7 +16,14 @@ IrLAP_secondary::IrLAP_secondary() : IrPHY()
 void IrLAP_secondary::init(){
     IrPHY::init();
 
-    init();
+    // initialize the LAP layer
+
+    // generate a unique device ID: 
+    // use the random number generated on production, available in the TLV Table
+    // under address 0x01A30 - 0x01A3F
+    device_address = *((uint32_t*)(0x01A30));
+
+    
 }
 
 
