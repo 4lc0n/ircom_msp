@@ -37,7 +37,6 @@ private:
     // could also be moved to the PHY? nope?
     uint16_t calcualte_CRC(uint8_t* data, uint16_t length);
 
-    void handle_discovery_procedure(uint8_t *frame, uint16_t length);
 
 
 
