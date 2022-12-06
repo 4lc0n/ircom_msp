@@ -38,6 +38,17 @@ void IrLAP_secondary::init(){
 
 }
 
+/**
+ * @brief function to go into idle / sleep state
+ * 
+ */
+void IrLAP_secondary::deinit(){
+    IrPHY::deinit();
+
+
+}
+
+
 
 /**
  * @brief interface function for the IrPHY to let the IrLAP know, a new
@@ -52,10 +63,22 @@ void IrLAP_secondary::notify_new_frame(uint8_t* data_wrapper, uint16_t length)
     // using field assignment
     wrapper_in.bof = data_wrapper[0];
     wrapper_in.eof = data_wrapper[length-1];
-    wrapper_in.fcs = (data_wrapper[length-3] << 8 | frame[length-2]);
+    wrapper_in.fcs = (data_wrapper[length-3] << 8 | data_wrapper[length-2]);
 
     // copy the frame content from data_wrapper to memory. length - 4, so bof, eof and fcs is not included.
     memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
+
+
+    // make crc check
+    // check the CRC check
+    if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
+    {
+        // CRC-check failed
+        // TODO: do something :D
+    }
+
+    // set flag to notify on next tick function
+    new_frame_available = true;
 }
 
 
@@ -88,3 +111,25 @@ uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
     return CRCINIRES;
 }
 
+
+
+
+void IrLAP_secondary::tick(){
+
+    // check current state
+    if(current_state == OFFLINE){
+        // do nothing? 
+    }
+
+
+    if(new_frame_available){
+        // handle new frame
+        // crc check is done in handle_new_frame, as length is known at that stage
+
+        // determine frame content
+
+
+    }
+
+
+}
