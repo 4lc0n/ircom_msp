@@ -1,20 +1,15 @@
 #include <stdint.h>
 #include <ringbuffer.hpp>
 
+#include "irlap.hpp"
+
 class IrPHY
 {
 public:
 
     IrPHY();
 
-    enum baudrate {
-        b2400,
-        b9600,
-        b19200,
-        b38400,
-        b57600,
-        b115200
-    };
+
 
     void init();
     void deinit();
@@ -35,7 +30,7 @@ public:
 
     void send_next_data();
 
-    void set_baud(enum baudrate);
+    void set_baud(uint8_t baudrate);
 
     /**
      * @brief virtual function to notify L2 to process the received message
@@ -62,7 +57,7 @@ private:
     uint16_t last_receive_tick = 0;
 
     
-    enum baudrate current_baudrate = b9600;
+    uint8_t current_baudrate = BAUD_9600;
 
     enum receive_states {state_a, state_b, state_c, state_d} receive_state;
 

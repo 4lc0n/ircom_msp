@@ -1,10 +1,10 @@
 #include <stdint.h>
-#include <irphy.hpp>
-#include <ringbuffer.hpp>
-#include <irda.hpp>
+
 #include <msp430.h>
 
-
+#include "irphy.hpp"
+#include "ringbuffer.hpp"
+#include "irlap.hpp"
 
 IrPHY::IrPHY()
 {
@@ -340,7 +340,7 @@ void IrPHY::send_next_data()
 }
 
 
-void IrPHY::set_baud(enum baudrate)
+void IrPHY::set_baud(uint8_t baudrate)
 {
     // TODO: this
     // required: global current clock frequency 

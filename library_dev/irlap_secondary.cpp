@@ -1,8 +1,9 @@
 #include "irlap_secondary.hpp"
 #include "irphy.hpp"
-#include "irda.hpp"
+#include "irlap.hpp"
 #include <msp430.h>
-
+#include <stdlib.h>
+#include <cstring>
 
 /**
  * @brief Construct a new IrLAP_secondary::IrLAP_secondary object
@@ -23,20 +24,38 @@ void IrLAP_secondary::init(){
     // under address 0x01A30 - 0x01A3F
     device_address = *((uint32_t*)(0x01A30));
 
-    
+    // set the default parameters
+    current_parameter.baud_rate = {BAUD_PI, 1, BAUD_9600};
+    current_parameter.turnaround_time = {TURNAROUND_T_PI, 1, TURNAROUND_T_500};
+    current_parameter.data_size = {DATA_SIZE_PI, 1, DATA_SIZE_64};
+    current_parameter.window_size = {WINDOW_SIZE_PI, 1, WINDOW_SIZE_1};
+    current_parameter.add_BOFs = {ADD_BOFS_PI, 1, ADD_BOFS_12};
+    current_parameter.turnaround_time_min = {TURNAROUND_T_MIN_PI, 1, TURNAROUND_T_MIN_10MS};
+    current_parameter.link_disconnect_threshold = {LINK_DISC_TH_T_PI, 1, LINK_DISC_TH_T_40};
+
+
+    IrPHY::set_baud(BAUD_9600);
+
 }
 
 
 /**
  * @brief interface function for the IrPHY to let the IrLAP know, a new
- * frame has arrived
+ * frame with wrapper has arrived
  * 
- * @param frame data pointer
- * @param length length of the frame
+ * @param data_wrapper data pointer to the received wrapper
+ * @param length length of the data_wrapper
  */
-void IrLAP_secondary::notify_new_frame(uint8_t* frame, uint16_t length)
+void IrLAP_secondary::notify_new_frame(uint8_t* data_wrapper, uint16_t length)
 {
-    // TODO: implement
+    // copy the incoming frame into the input wrapper
+    // using field assignment
+    wrapper_in.bof = data_wrapper[0];
+    wrapper_in.eof = data_wrapper[length-1];
+    wrapper_in.fcs = (data_wrapper[length-3] << 8 | frame[length-2]);
+
+    // copy the frame content from data_wrapper to memory. length - 4, so bof, eof and fcs is not included.
+    memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
 }
 
 
