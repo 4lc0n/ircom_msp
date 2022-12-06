@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include <msp430.h>
+#include <msp430fr5969.h>
 
 #include "irphy.hpp"
 #include "ringbuffer.hpp"

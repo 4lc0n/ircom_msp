@@ -7,11 +7,14 @@
                 "/opt/ccs/ccs1210/ccs/ccs_base/msp430/include/**",
                 "/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/**"
             ],
-            "defines": ["__MSP430FR5969__"],
+            "defines": [
+                "__MSP430FR5969__"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4
