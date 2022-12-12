@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include <ringbuffer.hpp>
 
+#include "irphy_interface.hpp"
 #include "irlap.hpp"
 
-class IrPHY
+class IrPHY : public IrPHY_Interface
 {
 public:
 
@@ -33,12 +34,14 @@ public:
     void set_baud(uint8_t baudrate);
 
     /**
-     * @brief virtual function to notify L2 to process the received message
+     * @brief Get the new frame 
      * 
-     * @param frame 
-     * @param length 
+     * @param frame     frame pointer reference; will be set to address
+     * @param length    length; will be set to number of bytes
+     * @return true     data is ready
+     * @return false    no data ready
      */
-    virtual void notify_new_frame(uint8_t* frame, uint16_t length) = 0;
+    bool get_new_frame(uint8_t*& frame, uint16_t &length);
 
 
 private:
@@ -53,6 +56,8 @@ private:
 
     bool _is_transmitting = false;
     bool _is_receiving = false;
+
+    uint16_t _data_bytes_ready = 0;
 
     uint16_t last_receive_tick = 0;
 

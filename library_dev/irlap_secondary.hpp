@@ -60,7 +60,8 @@ private:
     // methods for interfacing with the PHY
     // could also be moved to the PHY? nope?
     uint16_t calcualte_CRC(uint8_t* data, uint16_t length);
-    void notify_new_frame(uint8_t* data_wrapper, uint16_t length) override;
+    
+    bool receive_and_store();
     
 
 public:

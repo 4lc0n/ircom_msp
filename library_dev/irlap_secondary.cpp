@@ -50,36 +50,7 @@ void IrLAP_secondary::deinit(){
 
 
 
-/**
- * @brief interface function for the IrPHY to let the IrLAP know, a new
- * frame with wrapper has arrived
- * 
- * @param data_wrapper data pointer to the received wrapper
- * @param length length of the data_wrapper
- */
-void IrLAP_secondary::notify_new_frame(uint8_t* data_wrapper, uint16_t length)
-{
-    // copy the incoming frame into the input wrapper
-    // using field assignment
-    wrapper_in.bof = data_wrapper[0];
-    wrapper_in.eof = data_wrapper[length-1];
-    wrapper_in.fcs = (data_wrapper[length-3] << 8 | data_wrapper[length-2]);
 
-    // copy the frame content from data_wrapper to memory. length - 4, so bof, eof and fcs is not included.
-    memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
-
-
-    // make crc check
-    // check the CRC check
-    if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
-    {
-        // CRC-check failed
-        // TODO: do something :D
-    }
-
-    // set flag to notify on next tick function
-    new_frame_available = true;
-}
 
 
 /**
@@ -120,6 +91,7 @@ void IrLAP_secondary::tick(){
     if(current_state == OFFLINE){
         // do nothing? 
     }
+    
 
 
     if(new_frame_available){
@@ -132,4 +104,47 @@ void IrLAP_secondary::tick(){
     }
 
 
+}
+
+
+bool IrLAP_secondary::receive_and_store(){
+    uint16_t length;
+    uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
+
+    if( ! IrPHY::get_new_frame(data_wrapper, length)){
+        // nothing available 
+        free(data_wrapper);
+        return false;
+    }
+
+
+    if(data_wrapper == 0 && length == 0){ 
+        // not data available
+        free(data_wrapper);
+        return false;
+    }
+    // copy the incoming frame into the input wrapper
+    // using field assignment
+    wrapper_in.bof = data_wrapper[0];
+    wrapper_in.eof = data_wrapper[length-1];
+    wrapper_in.fcs = (data_wrapper[length-3] << 8 | data_wrapper[length-2]);
+
+
+    // copy the frame content from data_wrapper to memory. length - 4, so bof, eof and fcs is not included.
+    memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
+
+    free(data_wrapper);
+
+    // make crc check
+    // check the CRC check
+    if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
+    {
+        // CRC-check failed
+        // TODO: do something :D
+
+        
+    }
+
+    
+    return true;
 }

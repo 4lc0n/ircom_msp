@@ -291,7 +291,8 @@ void IrPHY::put_received_data(uint8_t data)
             // change state to A
             receive_state = state_a;
 
-            notify_new_frame(transfer_buffer, i);
+            // set flag to data ready: set the amounts of bytes in the transfer buffer
+            _data_bytes_ready = i;
 
             
         }
@@ -305,10 +306,30 @@ void IrPHY::put_received_data(uint8_t data)
         break;
     }
    
-    
+}
 
+/**
+ * @brief Get the new frame 
+ * 
+ * @param frame     frame pointer reference; will be set to address
+ * @param length    length; will be set to number of bytes
+ * @return true     data is ready
+ * @return false    no data ready
+ */
+bool get_new_frame(uint8_t*& frame, uint16_t &length)
+{
+    if(_data_bytes_ready == 0)
+    {
+        return false;
+    }
 
-        
+    length =  _data_bytes_ready;
+    frame = transfer_buffer;
+
+    // reset the data ready flag
+    _data_bytes_ready = 0;
+
+    return true;
 
 }
 
