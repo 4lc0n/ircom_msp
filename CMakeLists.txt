@@ -25,7 +25,6 @@ include_directories(library_dev)
 # include_directories(/opt/ccs/ccs1210/ccs/ccs_base/msp430/include/)
 # include_directories(/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/)
 
-
-add_subdirectory(tests)
 add_subdirectory(library_dev)
+add_subdirectory(tests)
 

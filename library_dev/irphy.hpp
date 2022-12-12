@@ -46,7 +46,7 @@ public:
 
 private:
     // TODO: maybe get rid of this
-    uint8_t transfer_buffer[255] = {0};
+    uint8_t transfer_buffer[256] = {0};
 
 
     char _input_buffer[255] = {0};
