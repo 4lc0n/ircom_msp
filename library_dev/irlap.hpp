@@ -133,8 +133,43 @@ typedef struct {
 typedef union {
     address_field_struct c;
     uint8_t raw;
-}address_field;         // address field union with address and C/R field
+}address_field_t;         // address field union with address and C/R field
 
+
+// ================================================
+// =========== Supervisory Format =================
+// ================================================
+// supervisory control format
+typedef struct {
+    
+    uint8_t cs:4;           // lsb; control sequence (XX01 bits)
+    uint8_t p_f:1;          // poll/final bit field: poll -> request data from sec. final -> last frame from second.
+    uint8_t nr:3;           // Nr field for numbered frame number - 1
+}s_control_field_struct;
+
+typedef union {
+    s_control_field_struct s;
+    uint8_t raw;
+}s_control_field;         // supervisory control field union with Nr, P/F, X, X, 0, 1
+
+
+// ================================================
+// =========== Information Format =================
+// ================================================
+
+// information control format
+typedef struct {
+    
+    uint8_t none:1;         // lsb; always 0 
+    uint8_t ns:3;           // Ns field for
+    uint8_t p_f:1;          // poll/final bit field: poll -> request data from sec. final -> last frame from second.
+    uint8_t nr:3;           // Nr field for numbered frame number - 1
+}i_control_field_struct;
+
+typedef union {
+    s_control_field_struct s;
+    uint8_t raw;
+}i_control_field;         // supervisory control field union with Nr, P/F, X, X, 0, 1
 
 
 // ================================================
@@ -147,22 +182,11 @@ typedef union {
 typedef struct {
     uint32_t soure_device_address;
     uint32_t destination_device_address;
-    address_field address_field;
+    address_field_t address_field;
     connection_parameter negotiation_parameters;
     
 }information_field_SNRM;
 
-
-/**
- * @brief Informatino field format for XID (exchange station identification) field
- * 
- */
-typedef struct{
-    address_field address_field;        // address field (raw): Command: 0xFF, Response: 0xFE
-    uint8_t xid_cmd_rsp;                // xid command / response
-    uint8_t format_identifier;          // 0x01 always
-    XID_format_field xid_format_field;  // format specific fields
-}information_field_XID;
 
 typedef struct{
     uint32_t source_device_address;
@@ -172,6 +196,19 @@ typedef struct{
     uint8_t version_number;
     uint8_t discover_info[32];
 }XID_format_field;
+
+/**
+ * @brief Informatino field format for XID (exchange station identification) field
+ * 
+ */
+typedef struct{
+    address_field_t address_field;        // address field (raw): Command: 0xFF, Response: 0xFE
+    uint8_t xid_cmd_rsp;                // xid command / response
+    uint8_t format_identifier;          // 0x01 always
+    XID_format_field xid_format_field;  // format specific fields
+}information_field_XID;
+
+
 
 
 /**
@@ -210,39 +247,7 @@ typedef struct{
 }information_field_FRMR;
 
 
-// ================================================
-// =========== Supervisory Format =================
-// ================================================
-// supervisory control format
-typedef struct {
-    
-    uint8_t cs:4;           // lsb; control sequence (XX01 bits)
-    uint8_t p_f:1;          // poll/final bit field: poll -> request data from sec. final -> last frame from second.
-    uint8_t nr:3;           // Nr field for numbered frame number - 1
-}s_control_field_struct;
-
-typedef union {
-    s_control_field_struct s;
-    uint8_t raw;
-}s_control_field;         // supervisory control field union with Nr, P/F, X, X, 0, 1
 
 
-// ================================================
-// =========== Information Format =================
-// ================================================
-
-// information control format
-typedef struct {
-    
-    uint8_t none:1;         // lsb; always 0 
-    uint8_t ns:3;           // Ns field for
-    uint8_t p_f:1;          // poll/final bit field: poll -> request data from sec. final -> last frame from second.
-    uint8_t nr:3;           // Nr field for numbered frame number - 1
-}i_control_field_struct;
-
-typedef union {
-    s_control_field_struct s;
-    uint8_t raw;
-}i_control_field;         // supervisory control field union with Nr, P/F, X, X, 0, 1
 
 #endif

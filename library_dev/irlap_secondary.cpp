@@ -1,21 +1,27 @@
 #include "irlap_secondary.hpp"
 #include "irphy.hpp"
 #include "irlap.hpp"
+#include "irphy_interface.hpp"
+
+#ifndef UNIT_TESTING
 #include <msp430.h>
+#endif
+
 #include <stdlib.h>
 #include <cstring>
 
 /**
  * @brief Construct a new IrLAP_secondary::IrLAP_secondary object
  * 
+ * @param irphy irphy interface type
  */
-IrLAP_secondary::IrLAP_secondary() : IrPHY()
+IrLAP_secondary::IrLAP_secondary(IrPHY_Interface *irphy)
 {
-    
+    this->irphy = irphy;
 }
 
 void IrLAP_secondary::init(){
-    IrPHY::init();
+    irphy->init();
 
     // initialize the LAP layer
 
@@ -35,7 +41,7 @@ void IrLAP_secondary::init(){
     current_parameter.link_disconnect_threshold = {LINK_DISC_TH_T_PI, 1, LINK_DISC_TH_T_40};
 
 
-    IrPHY::set_baud(BAUD_9600);
+    irphy->set_baud(BAUD_9600);
 
 }
 
@@ -44,7 +50,7 @@ void IrLAP_secondary::init(){
  * 
  */
 void IrLAP_secondary::deinit(){
-    IrPHY::deinit();
+    irphy->deinit();
 
 
 }
@@ -117,7 +123,7 @@ bool IrLAP_secondary::receive_and_store(){
     uint16_t length;
     uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
 
-    if( ! IrPHY::get_new_frame(data_wrapper, length)){
+    if( ! irphy->get_new_frame(data_wrapper, length)){
         // nothing available 
         free(data_wrapper);
         return false;

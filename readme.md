@@ -35,7 +35,7 @@ to build unit tests: execute the following statements (linux)
 
     cmake --build .
 
-    ./ctest notifynotify
+    ./ctest 
 
 
 to extend the unit tests: 

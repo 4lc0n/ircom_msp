@@ -1,3 +1,6 @@
+#ifndef IRPHY_HPP
+#define IRPHY_HPP
+
 #include <stdint.h>
 #include <ringbuffer.hpp>
 
@@ -75,3 +78,5 @@ private:
 
 
 };
+
+#endif

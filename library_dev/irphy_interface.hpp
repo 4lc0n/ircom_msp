@@ -1,3 +1,6 @@
+#ifndef IRPHY_INTERFACE
+#define IRPHY_INTERFACE
+
 #include <stdint.h>
 
 
@@ -10,7 +13,9 @@ class IrPHY_Interface
 
 public:
 
-    
+// #ifdef UNIT_TESTING
+    virtual ~IrPHY_Interface();
+// #endif
 
     virtual void init() = 0;
     virtual void deinit() = 0;
@@ -28,7 +33,9 @@ public:
      * @param length 
      * 
      */
-    virtual void get_new_frame(uint8_t* frame, uint16_t length) = 0;
+    virtual bool get_new_frame(uint8_t* &frame, uint16_t &length) = 0;
 
 
 };
+
+#endif

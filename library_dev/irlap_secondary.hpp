@@ -11,8 +11,8 @@
  * 
  */
 
-#ifndef IRLAP_SECONDARY_HPP
-#define IRLAP_SECONDARY_HPP
+#ifndef IRLAP_SECONDARY
+#define IRLAP_SECONDARY
 
 #include "irphy.hpp"
 #include <stdint.h>
@@ -21,11 +21,13 @@
 
 
 
-class IrLAP_secondary : public IrPHY
+class IrLAP_secondary
 {
 
 
 private:
+
+    IrPHY_Interface *irphy;
 
     uint32_t device_address;                    // uinque device address
     
@@ -36,11 +38,11 @@ private:
         uint8_t address;
         uint8_t control;
         uint8_t information[64];
-    }frame; // frame_payload_out, frame_payload_in;     // rather use a frame ponter to the wrapper frame
+    }frame_t; // frame_payload_out, frame_payload_in;     // rather use a frame ponter to the wrapper frame
 
     struct  wrapper{
         uint8_t bof;
-        frame frame;
+        frame_t frame;
         uint16_t fcs;
         uint8_t eof; 
     } wrapper_out, wrapper_in;
@@ -65,7 +67,7 @@ private:
     
 
 public:
-    IrLAP_secondary();
+    IrLAP_secondary(IrPHY_Interface *irphy);
 
     void init();
     void deinit();

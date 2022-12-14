@@ -1,3 +1,6 @@
+#ifndef RINGBUFFER_HPP
+#define RINGBUFFER_HPP
+
 #include <stdint.h>
 
 
@@ -197,3 +200,5 @@ template <typename T> void Ringbuffer<T>::clear_buffer()
 {
     head = (tail + 1) % length;
 }
+
+#endif
