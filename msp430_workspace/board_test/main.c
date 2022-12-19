@@ -11,7 +11,7 @@
 
 // ====== GPIO OUTPUT CHANNELS ====== // 
 
-#define NTC_SUP_PIN BIT3
+#define NTC_SUP_PIN BIT0
 #define NTC_SUP_DIR P3DIR
 #define NTC_SUP_OUT P3OUT
 
@@ -72,14 +72,37 @@ int main() {
   P4DIR = 0;
   PJDIR = 0;
 
+  P1OUT = 0;
+  P2OUT = 0;
+  P3OUT = 0;
+  P4OUT = 0;
+  PJOUT = 0;
+
 
   // setup all enable pins
 
   NTC_SUP_DIR |= NTC_SUP_PIN;
+  NTC_SUP_OUT |= NTC_SUP_PIN;
 
   EN_U_MEAS_DIR |= EN_U_MEAS_PIN;
+  EN_U_MEAS_OUT |= EN_U_MEAS_PIN;
 
   EN_IR_SMD_DIR |= EN_IR_SMD_PIN;
+  EN_IR_SMD_OUT |= EN_IR_SMD_PIN;
+
+
+
+
+  // Disable the GPIO power-on default high-impedance mode to activate
+    // previously configured port settings
+    PM5CTL0 &= ~LOCKLPM5;
+
+    // Startup clock system with max DCO setting ~8MHz
+    CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
+    CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+    CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+    CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
+    CSCTL0_H = 0;                             // Lock CS registers
 
 
   // setup ADC 
@@ -111,16 +134,7 @@ int main() {
 
 
 
-  // Disable the GPIO power-on default high-impedance mode to activate
-  // previously configured port settings
-  PM5CTL0 &= ~LOCKLPM5;
 
-  // Startup clock system with max DCO setting ~8MHz
-  CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
-  CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
-  CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
-  CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
-  CSCTL0_H = 0;                             // Lock CS registers
 
   // Configure USCI_A0 for UART mode
   UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
@@ -167,6 +181,7 @@ int main() {
 
     __delay_cycles(8e6);
 
+    __bis_SR_register(GIE);
   }
 
 
