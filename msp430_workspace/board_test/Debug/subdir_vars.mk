@@ -3,25 +3,25 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
+CPP_SRCS += \
+../main.cpp 
+
 CMD_SRCS += \
 ../lnk_msp430fr5948.cmd 
-
-C_SRCS += \
-../main.c 
-
-C_DEPS += \
-./main.d 
 
 OBJS += \
 ./main.obj 
 
+CPP_DEPS += \
+./main.d 
+
 OBJS__QUOTED += \
 "main.obj" 
 
-C_DEPS__QUOTED += \
+CPP_DEPS__QUOTED += \
 "main.d" 
 
-C_SRCS__QUOTED += \
-"../main.c" 
+CPP_SRCS__QUOTED += \
+"../main.cpp" 
 
 

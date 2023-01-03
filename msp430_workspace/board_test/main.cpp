@@ -6,52 +6,11 @@
 
 #include <msp430.h>
 #include <stdint.h>
+#include <string.h>
 
-
-
-// ====== GPIO OUTPUT CHANNELS ====== // 
-
-#define NTC_SUP_PIN BIT0
-#define NTC_SUP_DIR P3DIR
-#define NTC_SUP_OUT P3OUT
-
-#define EN_U_MEAS_PIN BIT5
-#define EN_U_MEAS_DIR P3DIR
-#define EN_U_MEAS_OUT P3OUT
-
-#define EN_IR_SMD_PIN BIT7
-#define EN_IR_SMD_DIR P3DIR
-#define EN_IR_SMD_OUT P3OUT
-
-
-// ====== ANALOG CHANNELS ====== // 
-
-#define NTC_SUP_MEAS_PIN BIT2
-#define NTC_SUP_MEAS_DIR P1DIR
-#define NTC_SUP_MEAS_SEL0 P1SEL0
-#define NTC_SUP_MEAS_SEL1 P1SEL1
-#define NTC_SUP_MEAS_AINCH ADC12INCH_2
-
-#define NTC_U_MEAS_PIN BIT1
-#define NTC_U_MEAS_DIR P1DIR
-#define NTC_U_MEAS_SEL0 P1SEL0
-#define NTC_U_MEAS_SEL1 P1SEL1
-#define NTC_U_MEAS_AINCH ADC12INCH_1
-
-#define U_MEAS_PIN BIT0
-#define U_MEAS_DIR P1DIR
-#define U_MEAS_SEL0 P1SEL0
-#define U_MEAS_SEL1 P1SEL1
-#define U_MEAS_AINCH ADC12INCH_0
-
-
-// ====== IRDA CHANNELS ====== //
-
-#define IRDA_RX_PIN BIT6
-#define IRDA_TX_PIN BIT5
-#define IRDA_DIR P2DIR
-#define IRDA_SEL0 P2SEL0
-#define IRDA_SEL1 P2SEL1
+#include "board.h"
+#include "irlap_secondary.hpp"
+#include "irphy.hpp"
 
 
 
@@ -59,6 +18,9 @@
 const char* str = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
 
+
+IrPHY_Interface *irphy;
+IrLAP_secondary *irlap;
 
 int main() {
 
@@ -94,15 +56,15 @@ int main() {
 
 
   // Disable the GPIO power-on default high-impedance mode to activate
-    // previously configured port settings
-    PM5CTL0 &= ~LOCKLPM5;
+  // previously configured port settings
+  PM5CTL0 &= ~LOCKLPM5;
 
-    // Startup clock system with max DCO setting ~8MHz
-    CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
-    CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
-    CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
-    CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
-    CSCTL0_H = 0;                             // Lock CS registers
+  // Startup clock system with max DCO setting ~8MHz
+  CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
+  CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+  CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+  CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
+  CSCTL0_H = 0;                             // Lock CS registers
 
 
   // setup ADC 
@@ -131,35 +93,13 @@ int main() {
   P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
   P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
 
+  // initialize the IR interface
+  irphy = new IrPHY();
+  irlap = new IrLAP_secondary(irphy);
 
+  irlap->init();
 
-
-
-
-  // Configure USCI_A0 for UART mode
-  UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
-  UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
-  // Baud Rate calculation
-  // 8000000/(16*9600) = 52.083
-  // Fractional portion = 0.083
-  // User's Guide Table 21-4: UCBRSx = 0x04
-  // UCBRFx = int ( (52.083-52)*16) = 1
-  UCA1BR0 = 52;                             // 8000000/16/9600
-  UCA1BR1 = 0x00;
-  UCA1MCTLW |= UCOS16; // | UCBRF_1;
-
-  // enable IrDA encoding
-  // pulse duration defined by UCIRTXPLx bits, specifying the number of one half clock periods of the clock selected by UCIRTXCLK
-  // to set the pulse time to 3/16 bit period required by the IrDA standard, the BITCLK16 clock is selected with UCIRTXCLK=1 and the pulse length
-  // is set to six one-half clock cycles with UCIRTXPLx = 6-1 = 5
-
-  // set pulse length, enalbe BITCLK16, enable encoder/decoder
-  UCA1IRCTL |= (5 << 2) | (UCIRTXCLK) | (UCIREN);
-
-
-
-  UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
-  // UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt || not needed in hello world
+  
 
 
   uint8_t i = 0;
@@ -275,3 +215,4 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12_ISR (void)
     default: break;
   }
 }
+
