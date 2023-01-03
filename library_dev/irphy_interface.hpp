@@ -13,9 +13,9 @@ class IrPHY_Interface
 
 public:
 
-// #ifdef UNIT_TESTING
+#ifdef UNIT_TESTING
     virtual ~IrPHY_Interface();
-// #endif
+#endif
 
     virtual void init() = 0;
     virtual void deinit() = 0;
