@@ -1,20 +1,19 @@
+#ifndef IRPHY_HPP
+#define IRPHY_HPP
+
 #include <stdint.h>
 #include <ringbuffer.hpp>
 
-class IrPHY
+#include "irphy_interface.hpp"
+#include "irlap.hpp"
+
+class IrPHY : public IrPHY_Interface
 {
 public:
 
     IrPHY();
 
-    enum baudrate {
-        b2400,
-        b9600,
-        b19200,
-        b38400,
-        b57600,
-        b115200
-    };
+
 
     void init();
     void deinit();
@@ -35,20 +34,22 @@ public:
 
     void send_next_data();
 
-    void set_baud(enum baudrate);
+    void set_baud(uint8_t baudrate);
 
     /**
-     * @brief virtual function to notify L2 to process the received message
+     * @brief Get the new frame 
      * 
-     * @param frame 
-     * @param length 
+     * @param frame     frame pointer reference; will be set to address
+     * @param length    length; will be set to number of bytes
+     * @return true     data is ready
+     * @return false    no data ready
      */
-    virtual void notify_new_frame(uint8_t* frame, uint16_t length) = 0;
+    bool get_new_frame(uint8_t*& frame, uint16_t &length);
 
 
 private:
     // TODO: maybe get rid of this
-    uint8_t transfer_buffer[255] = {0};
+    uint8_t transfer_buffer[256] = {0};
 
 
     char _input_buffer[255] = {0};
@@ -59,10 +60,12 @@ private:
     bool _is_transmitting = false;
     bool _is_receiving = false;
 
+    uint16_t _data_bytes_ready = 0;
+
     uint16_t last_receive_tick = 0;
 
     
-    enum baudrate current_baudrate = b9600;
+    uint8_t current_baudrate = BAUD_9600;
 
     enum receive_states {state_a, state_b, state_c, state_d} receive_state;
 
@@ -75,3 +78,5 @@ private:
 
 
 };
+
+#endif

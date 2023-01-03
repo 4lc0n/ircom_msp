@@ -1,10 +1,10 @@
 #include <stdint.h>
-#include <irphy.hpp>
-#include <ringbuffer.hpp>
-#include <irda.hpp>
-#include <msp430.h>
 
+#include <msp430fr5969.h>
 
+#include "irphy.hpp"
+#include "ringbuffer.hpp"
+#include "irlap.hpp"
 
 IrPHY::IrPHY()
 {
@@ -291,7 +291,8 @@ void IrPHY::put_received_data(uint8_t data)
             // change state to A
             receive_state = state_a;
 
-            notify_new_frame(transfer_buffer, i);
+            // set flag to data ready: set the amounts of bytes in the transfer buffer
+            _data_bytes_ready = i;
 
             
         }
@@ -305,10 +306,30 @@ void IrPHY::put_received_data(uint8_t data)
         break;
     }
    
-    
+}
 
+/**
+ * @brief Get the new frame 
+ * 
+ * @param frame     frame pointer reference; will be set to address
+ * @param length    length; will be set to number of bytes
+ * @return true     data is ready
+ * @return false    no data ready
+ */
+bool IrPHY::get_new_frame(uint8_t*& frame, uint16_t &length)
+{
+    if(_data_bytes_ready == 0)
+    {
+        return false;
+    }
 
-        
+    length =  _data_bytes_ready;
+    frame = transfer_buffer;
+
+    // reset the data ready flag
+    _data_bytes_ready = 0;
+
+    return true;
 
 }
 
@@ -340,7 +361,7 @@ void IrPHY::send_next_data()
 }
 
 
-void IrPHY::set_baud(enum baudrate)
+void IrPHY::set_baud(uint8_t baudrate)
 {
     // TODO: this
     // required: global current clock frequency 

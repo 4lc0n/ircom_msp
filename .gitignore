@@ -6,3 +6,13 @@
 
 msp430_workspace/.jxbrowser.userdata/
 msp430_workspace/ircom/.settings/
+msp430_workspace/ircom/.jxbrowser.userdata/
+.jxbrowser.userdata/
+.config/
+.launches/
+.metadata/
+Debug/
+Release/
+
+
+build
