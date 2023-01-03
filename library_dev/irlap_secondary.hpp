@@ -74,14 +74,17 @@ public:
 
     void tick();
 
-    virtual void IrLAP_CONNECT_indication() = 0;
-    void IrLAP_CONNECT_response();
+    // virtual void IrLAP_CONNECT_indication() = 0;
+    // void IrLAP_CONNECT_response();
 
-    void IrLAP_DATA_request(uint8_t *userData);
-    virtual void IrLAP_DATA_indication(uint8_t *userData, uint16_t length) = 0;
+    // void IrLAP_DATA_request(uint8_t *userData);
+    // virtual void IrLAP_DATA_indication(uint8_t *userData, uint16_t length) = 0;
 
-    void IrLAP_DISCONNECT_request();
-    virtual void IrLAP_DISCONNECT_indication() = 0;
+    // void IrLAP_DISCONNECT_request();
+    // virtual void IrLAP_DISCONNECT_indication() = 0;
+
+    void IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
+    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
 
 
 };

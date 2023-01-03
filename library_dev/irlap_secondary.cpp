@@ -145,6 +145,7 @@ bool IrLAP_secondary::receive_and_store(){
     // copy the frame content from data_wrapper to memory. length - 4, so bof, eof and fcs is not included.
     memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
 
+    // release memory 
     free(data_wrapper);
 
     // make crc check
@@ -159,4 +160,32 @@ bool IrLAP_secondary::receive_and_store(){
 
     
     return true;
+}
+
+
+/**
+ * @brief function to send connectionless user data to a broadcast address
+ * 
+ * @param userData data to be sent
+ * @param length length of data
+ */
+void IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
+{
+
+    // construct the data frame
+    uint8_t *data_buffer = (uint8_t*)malloc(length + 2);
+
+    data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
+    data_buffer[1] = UI_CMD;        // send a UI frame
+
+    // copy the userData into buffer
+    memcpy(data_buffer + 2, userData, length);
+
+    // call IrPHY function
+
+    irphy->send_frame(data_buffer, length+2);
+
+    // free memory
+    free(data_buffer);
+    
 }

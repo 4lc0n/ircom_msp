@@ -117,6 +117,29 @@ typedef struct{
 
 
 
+// command and response control bytes
+// Unnumbered Format
+// P/F bit is always kept zero in definitions
+#define SNRM_CMD    0x83        // SNRM command
+#define DISC_CMD    0x43        // DISC command
+#define UI_CMD      0x03        // UI command
+#define XID_CMD     0x2F        // XID command
+#define TEST_CMD    0xE3        // TEST command
+#define RNRM_RESP   0x83        // RNRM response
+#define UA_REESP    0x63        // UA response
+#define FRMR_RESP   0x87        // FRMR response
+#define DM_RESP     0x0F        // DM response
+#define RD_RESP     0x43        // RD response
+#define UI_RESP     0x03        // UI response
+#define XID_RESP    0xAF        // XID response
+#define TEST_RESP   0xE3        // TEST response
+
+// Supervisory Format
+#define RR_CMD_ReSP     0x01    // RR command / response
+#define RNR_CMD_ReSP    0x05    // RNR command / response
+#define REJ_CMD_ReSP    0x09    // REJ command / response
+#define SREJ_CMD_ReSP   0x0D    // SREJ command / response
+
 /**
  * @brief Struct format for the address field in LAP frame
  * 
@@ -198,7 +221,7 @@ typedef struct{
 }XID_format_field;
 
 /**
- * @brief Informatino field format for XID (exchange station identification) field
+ * @brief Information field format for XID (exchange station identification) field
  * 
  */
 typedef struct{

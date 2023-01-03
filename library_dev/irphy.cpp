@@ -316,7 +316,7 @@ void IrPHY::put_received_data(uint8_t data)
  * @return true     data is ready
  * @return false    no data ready
  */
-bool get_new_frame(uint8_t*& frame, uint16_t &length)
+bool IrPHY::get_new_frame(uint8_t*& frame, uint16_t &length)
 {
     if(_data_bytes_ready == 0)
     {
