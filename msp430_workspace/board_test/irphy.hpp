@@ -41,9 +41,8 @@ public:
      * 
      * @param frame     frame pointer reference; will be set to address
      * @param length    length; will be set to number of bytes
-     * @return bool     bool value
-     * @retval true     data is ready
-     * @retval false    no data ready
+     * @return true     data is ready
+     * @return false    no data ready
      */
     bool get_new_frame(uint8_t*& frame, uint16_t &length);
 

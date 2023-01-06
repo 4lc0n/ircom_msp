@@ -83,7 +83,7 @@ public:
     // void IrLAP_DISCONNECT_request();
     // virtual void IrLAP_DISCONNECT_indication() = 0;
 
-    int IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
+    void IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
     // virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
 
 

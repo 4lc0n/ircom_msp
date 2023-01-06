@@ -24,11 +24,11 @@ main.obj: /opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/l
 main.obj: /opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/string.h
 main.obj: /opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/xlocale/_string.h
 main.obj: ../board.h
-main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irlap_secondary.hpp
-main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irphy.hpp
-main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/ringbuffer.hpp
-main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irphy_interface.hpp
-main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irlap.hpp
+main.obj: ../irlap_secondary.hpp
+main.obj: ../irphy.hpp
+main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/msp430_workspace/board_test/ringbuffer.hpp
+main.obj: ../irphy_interface.hpp
+main.obj: ../irlap.hpp
 
 ../main.cpp:
 
@@ -78,13 +78,13 @@ main.obj: /home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/ir
 
 ../board.h:
 
-/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irlap_secondary.hpp:
+../irlap_secondary.hpp:
 
-/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irphy.hpp:
+../irphy.hpp:
 
-/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/ringbuffer.hpp:
+/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/msp430_workspace/board_test/ringbuffer.hpp:
 
-/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irphy_interface.hpp:
+../irphy_interface.hpp:
 
-/home/h3l/Documents/Studium/Master/Sem1/PEAS2/ircom_msp/library_dev/irlap.hpp:
+../irlap.hpp:
 

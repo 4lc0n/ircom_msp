@@ -1,3 +1,5 @@
+"./irlap_secondary.obj"
+"./irphy.obj"
 "./main.obj"
 "../lnk_msp430fr5948.cmd"
 -llibmpu_init.a
