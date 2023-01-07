@@ -1,4 +1,4 @@
-#include "irlap_secondary.hpp"
+#include "irlap_primary.hpp"
 #include "irphy.hpp"
 #include "irlap.hpp"
 #include "irphy_interface.hpp"
@@ -15,14 +15,13 @@
  * 
  * @param irphy irphy interface type
  */
-IrLAP_secondary::IrLAP_secondary()
+IrLAP_primary::IrLAP_primary(IrPHY_Interface *irphy)
 {
-    
+    this->irphy = irphy;
 }
 
-void IrLAP_secondary::init(IrPHY_Interface *irphy){
-    this->irphy = irphy;
-    this->irphy->init();
+void IrLAP_primary::init(){
+    irphy->init();
 
     // initialize the LAP layer
 
@@ -50,16 +49,10 @@ void IrLAP_secondary::init(IrPHY_Interface *irphy){
  * @brief function to go into idle / sleep state
  * 
  */
-void IrLAP_secondary::deinit(){
+void IrLAP_primary::deinit(){
     irphy->deinit();
 
-
 }
-
-
-
-
-
 
 /**
  * @brief calculates the CRC16 sum over a given data block
@@ -68,7 +61,7 @@ void IrLAP_secondary::deinit(){
  * @param length size in bytes of the data block
  * @return uint16_t 16 bit CRC checksum over the data block
  */
-uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
+uint16_t IrLAP_primary::calcualte_CRC(uint8_t* data, uint16_t length)
 {
     int ii = 0;
 
@@ -95,37 +88,58 @@ uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
 #endif
 }
 
+/**
+ * @brief tick function to be called periodically
+ * 
+ */
+void IrLAP_primary::tick(){ 
 
+    // do some stuff in here
 
+    // check if frame available
+    if(receive_and_store()) {
+        // frame available: 
 
-void IrLAP_secondary::tick(){
-
-    // check current state
-    if(current_state == OFFLINE){
-        // do nothing? 
+        // notify upper layer: 
+        if(wrapper_in.frame.control == UI_CMD)  {
+            IrLAP_USERDATA_indication(wrapper_in.frame.information, 64);
+        }
     }
-    
-
-
-    if(new_frame_available){
-        // handle new frame
-        // crc check is done in handle_new_frame, as length is known at that stage
-
-        // determine frame content
-
-
-    }
-
-
 }
 
+
+
 /**
- * @brief checks if a frame is available and if so, copies to wrapper_in
+ * @brief function to send connectionless user data to a broadcast address
  * 
- * @return true     frame was available and is stored
- * @return false    no frame available or with wrong FCS
+ * @param userData data to be sent
+ * @param length length of data
+ * @return int bytes pushed into send buffer
  */
-bool IrLAP_secondary::receive_and_store(){
+int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
+{
+
+    // construct the data frame
+    uint8_t *data_buffer = (uint8_t*)malloc(length + 2);
+
+    data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
+    data_buffer[1] = UI_CMD;        // send a UI frame
+
+    // copy the userData into buffer
+    memcpy(data_buffer + 2, userData, length);
+
+    // call IrPHY function
+
+    int bytes_sent = irphy->send_frame(data_buffer, length+2);
+
+    // free memory
+    free(data_buffer);
+    
+    return bytes_sent;
+}
+
+
+bool IrLAP_primary::receive_and_store(){
     uint16_t length;
     uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
 
@@ -161,39 +175,9 @@ bool IrLAP_secondary::receive_and_store(){
         // CRC-check failed
         // TODO: do something :D
 
-        return false;
+        
     }
 
     
     return true;
-}
-
-
-/**
- * @brief function to send connectionless user data to a broadcast address
- * 
- * @param userData data to be sent
- * @param length length of data
- * @return int bytes sent
- */
-int IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
-{
-
-    // construct the data frame
-    uint8_t *data_buffer = (uint8_t*)malloc(length + 2);
-
-    data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
-    data_buffer[1] = UI_CMD;        // send a UI frame
-
-    // copy the userData into buffer
-    memcpy(data_buffer + 2, userData, length);
-
-    // call IrPHY function
-
-    int bytes_sent = irphy->send_frame(data_buffer, length+2);
-
-    // free memory
-    free(data_buffer);
-    
-    return bytes_sent;
 }

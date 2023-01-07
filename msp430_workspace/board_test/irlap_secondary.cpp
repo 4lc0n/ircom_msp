@@ -15,13 +15,14 @@
  * 
  * @param irphy irphy interface type
  */
-IrLAP_secondary::IrLAP_secondary(IrPHY_Interface *irphy)
+IrLAP_secondary::IrLAP_secondary()
 {
-    this->irphy = irphy;
+    
 }
 
-void IrLAP_secondary::init(){
-    irphy->init();
+void IrLAP_secondary::init(IrPHY_Interface *irphy){
+    this->irphy = irphy;
+    this->irphy->init();
 
     // initialize the LAP layer
 
@@ -118,7 +119,12 @@ void IrLAP_secondary::tick(){
 
 }
 
-
+/**
+ * @brief checks if a frame is available and if so, copies to wrapper_in
+ * 
+ * @return true     frame was available and is stored
+ * @return false    no frame available or with wrong FCS
+ */
 bool IrLAP_secondary::receive_and_store(){
     uint16_t length;
     uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
@@ -155,7 +161,7 @@ bool IrLAP_secondary::receive_and_store(){
         // CRC-check failed
         // TODO: do something :D
 
-        
+        return false;
     }
 
     
@@ -168,8 +174,9 @@ bool IrLAP_secondary::receive_and_store(){
  * 
  * @param userData data to be sent
  * @param length length of data
+ * @return int bytes sent
  */
-void IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
+int IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 {
 
     // construct the data frame
@@ -183,9 +190,10 @@ void IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 
     // call IrPHY function
 
-    irphy->send_frame(data_buffer, length+2);
+    int bytes_sent = irphy->send_frame(data_buffer, length+2);
 
     // free memory
     free(data_buffer);
     
+    return bytes_sent;
 }

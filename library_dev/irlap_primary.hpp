@@ -62,9 +62,9 @@ private:
     
 
 public:
-    class IrLAP_primary (IrPHY_Interface *irphy);
+    class IrLAP_primary ();
 
-    void init();
+    void init(IrPHY_Interface* irphy);
     void deinit();
 
     void tick();
@@ -80,7 +80,7 @@ public:
 
     // void IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
 
-    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length)
+    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
 
     // TODO: remove this function on complete implementation
     uint8_t* get_received_information() {

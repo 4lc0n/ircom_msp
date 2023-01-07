@@ -8,9 +8,11 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./irlap_primary.obj" \
 "./irlap_secondary.obj" \
 "./irphy.obj" \
 "./main.obj" \
+"./microTP.obj" \
 "../lnk_msp430fr5948.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmpu_init.a \
@@ -142,7 +144,7 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 board_test.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: MSP430 Linker'
-	"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/bin/cl430" -vmspx --use_hw_mpy=F5 --advice:power=all --advice:hw_config="all" --define=__MSP430FR5948__ --define=_MPU_ENABLE -g --c11 --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"board_test.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/include" -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/lib/5xx_6xx_FRxx" -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/lib/FR59xx" -i"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/lib" -i"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include" --priority --reread_libs --define=_MPU_ENABLE --diag_wrap=off --display_error_number --warn_sections --xml_link_info="board_test_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "board_test.out" $(ORDERED_OBJS)
+	"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/bin/cl430" -vmspx -Ooff --use_hw_mpy=F5 --advice:power="all" --advice:hw_config="all" --define=__MSP430FR5948__ --define=_MPU_ENABLE -g --c11 --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"board_test.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/include" -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/lib/5xx_6xx_FRxx" -i"/opt/ccs/ccs1210/ccs/ccs_base/msp430/lib/FR59xx" -i"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/lib" -i"/opt/ccs/ccs1210/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include" --priority --reread_libs --define=_MPU_ENABLE --diag_wrap=off --display_error_number --warn_sections --xml_link_info="board_test_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "board_test.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
@@ -156,8 +158,8 @@ board_test.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "irlap_secondary.obj" "irphy.obj" "main.obj" 
-	-$(RM) "irlap_secondary.d" "irphy.d" "main.d" 
+	-$(RM) "irlap_primary.obj" "irlap_secondary.obj" "irphy.obj" "main.obj" "microTP.obj" 
+	-$(RM) "irlap_primary.d" "irlap_secondary.d" "irphy.d" "main.d" "microTP.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

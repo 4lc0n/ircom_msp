@@ -42,9 +42,9 @@ private:
     
     uint16_t packet_available = 0;                  // indicator if a packet was received (!= 0) or not (== 0)
 
-    constexpr uint8_t microTP_identifier = 0x69;    // identifier for this packet type
-    constexpr uint16_t buffer_length = 64;          // length of buffer
-    constexpr uint16_t added_overhead = 2;          // added overhead on wrapping
+    const uint8_t microTP_identifier = 0x69;    // identifier for this packet type
+    const uint16_t buffer_length = 64;          // length of buffer
+    const uint16_t added_overhead = 2;          // added overhead on wrapping
 
     uint8_t buffer_in [buffer_length];      // data puffer for received data, in plan information format
     uint8_t buffer_out [buffer_length];     // data puffer in packet format

@@ -15,7 +15,6 @@
 #include "irphy.hpp"
 #include <cstring>
 
-using IrLAP_primary;        // use namespace of IrLAP class
 
 /**
  * @brief Construct a new MicroTP::MicroTP object

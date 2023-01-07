@@ -5,22 +5,22 @@
  */
 
 #include <msp430.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
+#include <stdlib.h>
 
 #include "board.h"
-#include "irlap_secondary.hpp"
+#include "microTP.hpp"
 #include "irphy.hpp"
-
-
 
 
 const char* str = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
 
 
-IrPHY_Interface *irphy;
-IrLAP_secondary *irlap;
+MicroTP microTP();
+IrPHY irPHY();
+
 
 int main() {
 
@@ -94,10 +94,7 @@ int main() {
   P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
 
   // initialize the IR interface
-  irphy = new IrPHY();
-  irlap = new IrLAP_secondary(irphy);
-
-  irlap->init();
+  microTP.init(irPHY);
 
   
 

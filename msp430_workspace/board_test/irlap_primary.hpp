@@ -1,27 +1,22 @@
 /**
- * @file irlap_secondary.hpp
+ * @file irlap_primary.hpp
  * @author Juergen Markl (s-jmarkl@haw-landshut.de)
  * @brief 
  * @version 0.1
- * @date 2022-12-06
+ * @date 2023-01-05
  * 
- * @copyright Copyright (c) 2022
- * 
- * 
+ * @copyright Copyright (c) 2023
  * 
  */
 
-#ifndef IRLAP_SECONDARY
-#define IRLAP_SECONDARY
+#ifndef IRLAP_PRIMARY
+#define IRLAP_PRIMARY
 
 #include "irphy.hpp"
 #include <stdint.h>
 #include "irlap.hpp"
 
-
-
-
-class IrLAP_secondary
+class IrLAP_primary
 {
 
 
@@ -67,9 +62,9 @@ private:
     
 
 public:
-    IrLAP_secondary();
+    IrLAP_primary ();
 
-    void init(IrPHY_Interface *irphy);
+    void init(IrPHY_Interface* irphy);
     void deinit();
 
     void tick();
@@ -83,11 +78,20 @@ public:
     // void IrLAP_DISCONNECT_request();
     // virtual void IrLAP_DISCONNECT_indication() = 0;
 
+    // void IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
+
+    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
+
+    // TODO: remove this function on complete implementation
+    uint8_t* get_received_information() {
+        return wrapper_in.frame.information;
+    }
+
+    
     int IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
-    // virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
+    
 
-
-};
+};  
 
 
 #endif
