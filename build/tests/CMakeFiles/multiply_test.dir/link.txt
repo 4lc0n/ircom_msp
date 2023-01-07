@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++ CMakeFiles/multiply_test.dir/multiply_test.cpp.o -o multiply_test  ../lib/libgtest_main.a ../library_dev/libmultiply.a ../lib/libgtest.a 
