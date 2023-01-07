@@ -7,6 +7,20 @@
  * 
  * @copyright Copyright (c) 2023
  * 
+ * 
+ * Transport Protocol to simply transfer chunks of data
+ * 
+ * Adds overhead to the data passed through: 
+ * 
+ * --------------------------
+ * | 1B | 1B | n*B data     |
+ * --------------------------
+ *    |   |    |
+ *    |   |     -> data bytes
+ *    |    -> number of bytes of data (max. 255)
+ *     -> packet identifier
+ * 
+ * 
  */
 
 #ifndef MICROPTP
@@ -26,9 +40,20 @@ private:
     IrPHY irphy;
     
     bool is_initialized_ = false;
-    uint8_t buffer_in*; 
+    
+    uint16_t packet_available = 0;                  // indicator if a packet was received (!= 0) or not (== 0)
 
+    constexpr uint8_t microTP_identifier = 0x69;    // identifier for this packet type
+    constexpr uint16_t buffer_length = 64;          // length of buffer
+    constexpr uint16_t added_overhead = 2;          // added overhead on wrapping
+
+    uint8_t buffer_in [buffer_length];      // data puffer for received data, in plan information format
+    uint8_t buffer_out [buffer_length];     // data puffer in packet format
+    
     void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
+
+    void packet_wrap(uint8_t* data, uint16_t length);
+    bool packet_unwrap(uint8_t* data, uint16_t length);
 
 public: 
 
