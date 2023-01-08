@@ -13,7 +13,7 @@
 #define IRLAP_PRIMARY
 
 #include "irphy.hpp"
-#include <stdint.h>
+#include <cstdint>
 #include "irlap.hpp"
 
 class IrLAP_primary

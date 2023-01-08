@@ -9,11 +9,13 @@
  * 
  */
 
-#include "microTP.hpp"
+#include <MicroTP.hpp>
 #include "irlap.hpp"
 #include "irlap_primary.hpp"
 #include "irphy.hpp"
 #include <cstring>
+#include <cstdint>
+
 
 
 /**
@@ -42,7 +44,6 @@ void MicroTP::init(IrPHY_Interface* irphy) {
 void MicroTP::deinit() {
     IrLAP_primary::deinit();
     is_initialized_ = false;
-    free(buffer_in);
 }
 
 
@@ -63,7 +64,7 @@ int MicroTP::send(uint8_t* data, uint16_t length) {
 
     packet_wrap(data, length);
 
-    return IrLAP_primary::IrLAP_USERDATA_request(buffer_out, length + added_overhead);
+    return IrLAP_primary::IrLAP_USERDATA_request(buffer_out, length + ADDED_OVERHEAD);
 }
 
 /**
@@ -96,7 +97,7 @@ int MicroTP::receive(uint8_t* data, uint16_t* length) {
  */
 void MicroTP::IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) {
     if(packet_unwrap(userData, length)) {
-        packet_available = length - added_overhead;
+        packet_available = length - ADDED_OVERHEAD;
     }
     else {  // not successfully unwrapped
         packet_available = 0;
@@ -112,14 +113,14 @@ void MicroTP::IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) {
  * @param length length of data; must be less equal (buffer_length - 2)
  */
 void MicroTP::packet_wrap(uint8_t* data, uint16_t length) {
-    if(length > buffer_length - 2) {
+    if(length > BUFFER_LENGTH - 2) {
         // not enough space in buffer
     }
 
     buffer_out[0] = 0x69;
-    buffer_out[1] = (length > buffer_length) ? buffer_length : length;
+    buffer_out[1] = (length > BUFFER_LENGTH) ? BUFFER_LENGTH : length;
 
-    memcpy(&buffer_length[2], data, buffer_out[1]);
+    memcpy(&buffer_out[2], data, buffer_out[1]);
 }
 
 bool MicroTP::packet_unwrap(uint8_t* data, uint16_t length) {
@@ -136,6 +137,6 @@ bool MicroTP::packet_unwrap(uint8_t* data, uint16_t length) {
     }
 
     // copy data into input buffer
-    memcpy(buffer_in, &buffer[2], incoming_length);
+    memcpy(buffer_in, &(data[2]), incoming_length);
     return true;
 }

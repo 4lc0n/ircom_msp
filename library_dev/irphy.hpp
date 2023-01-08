@@ -1,7 +1,7 @@
 #ifndef IRPHY_HPP
 #define IRPHY_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include <ringbuffer.hpp>
 
 #include "irphy_interface.hpp"
@@ -45,7 +45,7 @@ public:
      * @retval true     data is ready
      * @retval false    no data ready
      */
-    bool get_new_frame(uint8_t*& frame, uint16_t &length);
+    bool get_new_frame(uint8_t* frame, uint16_t &length);
 
 
 private:

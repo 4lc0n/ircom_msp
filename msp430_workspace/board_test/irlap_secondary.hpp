@@ -15,7 +15,7 @@
 #define IRLAP_SECONDARY
 
 #include "irphy.hpp"
-#include <stdint.h>
+#include <cstdint>
 #include "irlap.hpp"
 
 

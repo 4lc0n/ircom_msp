@@ -8,11 +8,11 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./MicroTP.obj" \
 "./irlap_primary.obj" \
 "./irlap_secondary.obj" \
 "./irphy.obj" \
 "./main.obj" \
-"./microTP.obj" \
 "../lnk_msp430fr5948.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmpu_init.a \
@@ -158,8 +158,8 @@ board_test.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "irlap_primary.obj" "irlap_secondary.obj" "irphy.obj" "main.obj" "microTP.obj" 
-	-$(RM) "irlap_primary.d" "irlap_secondary.d" "irphy.d" "main.d" "microTP.d" 
+	-$(RM) "MicroTP.obj" "irlap_primary.obj" "irlap_secondary.obj" "irphy.obj" "main.obj" 
+	-$(RM) "MicroTP.d" "irlap_primary.d" "irlap_secondary.d" "irphy.d" "main.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

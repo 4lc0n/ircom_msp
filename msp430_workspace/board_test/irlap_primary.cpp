@@ -7,7 +7,7 @@
 #include <msp430.h>
 #endif
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
 
 /**
@@ -15,12 +15,13 @@
  * 
  * @param irphy irphy interface type
  */
-IrLAP_primary::IrLAP_primary(IrPHY_Interface *irphy)
+IrLAP_primary::IrLAP_primary()
 {
-    this->irphy = irphy;
+    ;
 }
 
-void IrLAP_primary::init(){
+void IrLAP_primary::init(IrPHY_Interface *irphy){
+    this->irphy = irphy;
     irphy->init();
 
     // initialize the LAP layer
@@ -120,7 +121,7 @@ int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 {
 
     // construct the data frame
-    uint8_t *data_buffer = (uint8_t*)malloc(length + 2);
+    uint8_t data_buffer[64];
 
     data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
     data_buffer[1] = UI_CMD;        // send a UI frame
@@ -133,7 +134,6 @@ int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
     int bytes_sent = irphy->send_frame(data_buffer, length+2);
 
     // free memory
-    free(data_buffer);
     
     return bytes_sent;
 }
@@ -141,18 +141,19 @@ int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 
 bool IrLAP_primary::receive_and_store(){
     uint16_t length;
-    uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
+    // uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);
+    uint8_t data_wrapper[64];
 
     if( ! irphy->get_new_frame(data_wrapper, length)){
         // nothing available 
-        free(data_wrapper);
+        // free(data_wrapper);
         return false;
     }
 
 
     if(data_wrapper == 0 && length == 0){ 
         // not data available
-        free(data_wrapper);
+        // free(data_wrapper);
         return false;
     }
     // copy the incoming frame into the input wrapper
@@ -166,7 +167,7 @@ bool IrLAP_primary::receive_and_store(){
     memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
 
     // release memory 
-    free(data_wrapper);
+    // free(data_wrapper);
 
     // make crc check
     // check the CRC check

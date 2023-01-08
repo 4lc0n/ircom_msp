@@ -7,7 +7,7 @@
 #include <msp430.h>
 #endif
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
 
 /**

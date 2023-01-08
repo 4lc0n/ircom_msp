@@ -32,6 +32,10 @@
 
 #include <cstdint>
 
+#define microTP_identifier (uint8_t)(0x69)  // identifier for this packet type
+#define BUFFER_LENGTH (64)                  // length of buffer
+#define ADDED_OVERHEAD (2)                  // added overhead on wrapping
+
 
 class MicroTP : protected IrLAP_primary {
 
@@ -42,12 +46,9 @@ private:
     
     uint16_t packet_available = 0;                  // indicator if a packet was received (!= 0) or not (== 0)
 
-    constexpr uint8_t microTP_identifier = 0x69;    // identifier for this packet type
-    constexpr uint16_t buffer_length = 64;          // length of buffer
-    constexpr uint16_t added_overhead = 2;          // added overhead on wrapping
 
-    uint8_t buffer_in [buffer_length];      // data puffer for received data, in plan information format
-    uint8_t buffer_out [buffer_length];     // data puffer in packet format
+    uint8_t buffer_in[BUFFER_LENGTH];      // data puffer for received data, in plan information format
+    uint8_t buffer_out[BUFFER_LENGTH];     // data puffer in packet format
     
     void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
 
@@ -65,6 +66,6 @@ public:
     void init(IrPHY_Interface* irphy);
     void deinit();
 
-}
+};
 
 #endif

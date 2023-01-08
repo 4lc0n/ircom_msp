@@ -1,7 +1,7 @@
 #ifndef IRLAP
 #define IRLAP
 
-#include <stdint.h>
+#include <cstdint>
 
 /**
  * @brief C Style definitions of Constants and Structs used for the

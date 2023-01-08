@@ -4,22 +4,24 @@
  * @return int 
  */
 
+#include <cstdlib>
+#include <ctype.h>
 #include <msp430.h>
+#include <MicroTP.hpp>
 #include <cstdint>
 #include <cstring>
-#include <stdlib.h>
+
 
 #include "board.h"
-#include "microTP.hpp"
 #include "irphy.hpp"
 
 
-const char* str = "Hello World\n";
+const char str[13] = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
 
 
-MicroTP microTP();
-IrPHY irPHY();
+MicroTP microTP = {};
+IrPHY_Interface* irPHY;
 
 
 int main() {
@@ -93,6 +95,8 @@ int main() {
   P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
   P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
 
+
+  irPHY = new IrPHY();
   // initialize the IR interface
   microTP.init(irPHY);
 

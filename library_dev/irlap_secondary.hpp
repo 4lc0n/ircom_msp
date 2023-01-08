@@ -15,7 +15,7 @@
 #define IRLAP_SECONDARY
 
 #include "irphy.hpp"
-#include <stdint.h>
+#include <cstdint>
 #include "irlap.hpp"
 
 
@@ -67,9 +67,9 @@ private:
     
 
 public:
-    IrLAP_secondary(IrPHY_Interface *irphy);
+    IrLAP_secondary();
 
-    void init();
+    void init(IrPHY_Interface *irphy);
     void deinit();
 
     void tick();

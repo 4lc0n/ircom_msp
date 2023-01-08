@@ -1,7 +1,7 @@
 #ifndef IRPHY_INTERFACE
 #define IRPHY_INTERFACE
 
-#include <stdint.h>
+#include <cstdint>
 
 
 /**
@@ -33,7 +33,7 @@ public:
      * @param length 
      * 
      */
-    virtual bool get_new_frame(uint8_t* &frame, uint16_t &length) = 0;
+    virtual bool get_new_frame(uint8_t* frame, uint16_t &length) = 0;
 
 
 };

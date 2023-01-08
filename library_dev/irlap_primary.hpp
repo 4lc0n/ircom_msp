@@ -13,7 +13,7 @@
 #define IRLAP_PRIMARY
 
 #include "irphy.hpp"
-#include <stdint.h>
+#include <cstdint>
 #include "irlap.hpp"
 
 class IrLAP_primary
@@ -62,7 +62,7 @@ private:
     
 
 public:
-    class IrLAP_primary ();
+    IrLAP_primary ();
 
     void init(IrPHY_Interface* irphy);
     void deinit();

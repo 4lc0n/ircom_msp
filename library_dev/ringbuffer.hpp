@@ -1,7 +1,7 @@
 #ifndef RINGBUFFER_HPP
 #define RINGBUFFER_HPP
 
-#include <stdint.h>
+#include <cstdint>
 
 
 
