@@ -21,7 +21,7 @@ volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
 
 
 MicroTP microTP = {};
-IrPHY_Interface* irPHY;
+IrPHY irPHY = {};
 
 
 int main() {
@@ -96,31 +96,31 @@ int main() {
   P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
 
 
-  irPHY = new IrPHY();
+
   // initialize the IR interface
-  microTP.init(irPHY);
+  microTP.init(&irPHY);
 
   
 
 
   uint8_t i = 0;
 
+  // enable Transceiver
+  EN_IR_SMD_OUT &= ~(EN_IR_SMD_PIN);
   while (1)
   {
     
     // send string to UART interface
 
-    for(i = 0; i < strlen(str); i++){
-      while(UCA1STATW & UCBUSY);
-      UCA1TXBUF = str[i];
-    }
 
+
+    microTP.send((uint8_t*)str, strlen(str));
     // start ADC conversion
 
     ADC12CTL0 |= ADC12ENC | ADC12SC;         // Sampling and conversion start
 
 
-    __delay_cycles(8e6);
+    __delay_cycles(8e5);
 
     __bis_SR_register(GIE);
   }
@@ -131,10 +131,10 @@ int main() {
 }
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector=USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void)
+#pragma vector=USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void)
 #elif defined(__GNUC__)
-void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void)
+void __attribute__ ((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void)
 #else
 #error Compiler not supported!
 #endif
@@ -149,7 +149,7 @@ void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void)
     case USCI_UART_UCTXIFG:
       // the last char was successfully transferred
       // send next data
-      // irPHY.send_next_data();
+      irPHY.send_next_data();
       break;
     case USCI_UART_UCSTTIFG: break;
     case USCI_UART_UCTXCPTIFG: break;

@@ -53,8 +53,8 @@ private:
     uint8_t transfer_buffer[256] = {0};
 
 
-    char _input_buffer[255] = {0};
-    char _output_buffer[255] = {0};
+    char _input_buffer[100] = {0};
+    char _output_buffer[100] = {0};
     Ringbuffer<char> input_buffer;
     Ringbuffer<char> output_buffer;
 

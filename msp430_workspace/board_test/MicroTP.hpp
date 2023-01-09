@@ -37,7 +37,7 @@
 #define ADDED_OVERHEAD (2)                  // added overhead on wrapping
 
 
-class MicroTP : protected IrLAP_primary {
+class MicroTP : public IrLAP_primary {
 
 private:
 
@@ -50,7 +50,7 @@ private:
     uint8_t buffer_in[BUFFER_LENGTH];      // data puffer for received data, in plan information format
     uint8_t buffer_out[BUFFER_LENGTH];     // data puffer in packet format
     
-    void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
+    void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) override;
 
     void packet_wrap(uint8_t* data, uint16_t length);
     bool packet_unwrap(uint8_t* data, uint16_t length);
@@ -63,7 +63,7 @@ public:
 
     int receive(uint8_t* data, uint16_t* length);
 
-    void init(IrPHY_Interface* irphy);
+    void init(IrPHY* irphy);
     void deinit();
 
 };

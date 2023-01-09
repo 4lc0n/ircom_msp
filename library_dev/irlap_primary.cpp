@@ -20,7 +20,7 @@ IrLAP_primary::IrLAP_primary()
     ;
 }
 
-void IrLAP_primary::init(IrPHY_Interface *irphy){
+void IrLAP_primary::init(IrPHY *irphy){
     this->irphy = irphy;
     irphy->init();
 

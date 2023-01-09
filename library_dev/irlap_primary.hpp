@@ -22,7 +22,7 @@ class IrLAP_primary
 
 private:
 
-    IrPHY_Interface *irphy;
+    IrPHY *irphy;
 
     uint32_t device_address;                    // uinque device address
     
@@ -59,12 +59,15 @@ private:
     uint16_t calcualte_CRC(uint8_t* data, uint16_t length);
     
     bool receive_and_store();
-    
+
+    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) = 0;
+
+
 
 public:
     IrLAP_primary ();
 
-    void init(IrPHY_Interface* irphy);
+    void init(IrPHY* irphy);
     void deinit();
 
     void tick();
@@ -80,7 +83,6 @@ public:
 
     // void IrLAP_USERDATA_request(uint8_t *userData, uint16_t length);
 
-    virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length);
 
     // TODO: remove this function on complete implementation
     uint8_t* get_received_information() {

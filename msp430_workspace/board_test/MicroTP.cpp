@@ -32,7 +32,7 @@ MicroTP::MicroTP()
  * @brief initialize this and base classes 
  * 
  */
-void MicroTP::init(IrPHY_Interface* irphy) {
+void MicroTP::init(IrPHY* irphy) {
     IrLAP_primary::init(irphy);
     is_initialized_ = true;
 }
@@ -95,7 +95,7 @@ int MicroTP::receive(uint8_t* data, uint16_t* length) {
  * @param userData  information of the received UI frame
  * @param length    max. length of the information block
  */
-void MicroTP::IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) {
+void MicroTP::IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length)  {
     if(packet_unwrap(userData, length)) {
         packet_available = length - ADDED_OVERHEAD;
     }

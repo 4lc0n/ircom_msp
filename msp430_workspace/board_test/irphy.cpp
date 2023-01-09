@@ -343,7 +343,11 @@ void IrPHY::clear_intput_buffer()
 
 void IrPHY::send_next_data()
 {
-    _is_transmitting = true;
+    if(!_is_transmitting) {
+        
+        _is_transmitting = true;
+    }
+   
     if(!output_buffer.is_empty())
     {
         // send data
