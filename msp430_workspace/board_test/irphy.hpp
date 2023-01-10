@@ -7,6 +7,10 @@
 #include "irphy_interface.hpp"
 #include "irlap.hpp"
 
+#define BITBANG
+#define BITBANG_PULSE_US 19
+#define BITBANG_PAUSE_US 85
+
 class IrPHY : public IrPHY_Interface
 {
 public:

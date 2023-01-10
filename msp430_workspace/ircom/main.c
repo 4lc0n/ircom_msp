@@ -79,6 +79,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "board.h"
+
 
 const char* str = "Hello World\n";
 
@@ -93,8 +95,7 @@ int main(void)
   WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
 
   // Configure GPIO
-  P2SEL1 |= BIT5 | BIT6;                    // USCI_A0 UART operation
-  P2SEL0 &= ~(BIT5 | BIT6);
+
 
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -107,40 +108,15 @@ int main(void)
   CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
   CSCTL0_H = 0;                             // Lock CS registers
 
-  // Configure USCI_A0 for UART mode
-  UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
-  UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
-  // Baud Rate calculation
-  // 8000000/(16*9600) = 52.083
-  // Fractional portion = 0.083
-  // User's Guide Table 21-4: UCBRSx = 0x04
-  // UCBRFx = int ( (52.083-52)*16) = 1
-  UCA1BR0 = 52;                             // 8000000/16/9600
-  UCA1BR1 = 0x00;
-  UCA1MCTLW |= UCOS16; // | UCBRF_1;
-
-  // enable IrDA encoding
-  // pulse duration defined by UCIRTXPLx bits, specifying the number of one half clock periods of the clock selected by UCIRTXCLK
-  // to set the pulse time to 3/16 bit period required by the IrDA standard, the BITCLK16 clock is selected with UCIRTXCLK=1 and the pulse length
-  // is set to six one-half clock cycles with UCIRTXPLx = 6-1 = 5
-
-  // set pulse length, enalbe BITCLK16, enable encoder/decoder
-  UCA1IRCTL |= (5 << 2) | (UCIRTXCLK) | (UCIREN);
-
-
-
-  UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
-  // UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt || not needed in hello world
-
   
+
   uint8_t i = 0;
 
   while (1) 
   {
     
     for(i = 0; i < strlen(str); i++){
-      while(UCA1STATW & UCBUSY);
-      UCA1TXBUF = str[i];
+
     }
 
     __delay_cycles(8e6);

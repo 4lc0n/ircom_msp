@@ -1,10 +1,14 @@
 #include <cstdint>
 
-#include <msp430fr5969.h>
+#include "msp430.h"
+#include "board.h"
+#include "time.h"
 
 #include "irphy.hpp"
 #include "ringbuffer.hpp"
 #include "irlap.hpp"
+
+
 
 IrPHY::IrPHY()
 {
@@ -353,7 +357,52 @@ void IrPHY::send_next_data()
         // send data
         char d = output_buffer.pop();
         
+#ifndef BITBANG
+
         UCA1TXBUF = d;
+
+#else
+
+        // send start
+
+        uint32_t t = get_time();
+        IRDA_OUT |= IRDA_TX_PIN;
+
+        while(t < (t + BITBANG_PULSE_US)) {
+            ;
+        }
+        IRDA_OUT &= ~IRDA_TX_PIN;
+
+        while(t < (t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
+            ;
+        }
+
+        uint8_t bit = 0x80;
+        do {
+            
+            // if bit is a zero: send a pulse
+            if(!(bit & d)) {
+                IRDA_OUT |= IRDA_TX_PIN;
+            }
+            
+            // wait pulse length
+            while(t < (t + BITBANG_PULSE_US)) {
+                ;
+            }
+            // clear pulse
+            IRDA_OUT &= ~IRDA_TX_PIN;
+
+            // wait for pause
+            while(t < (t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
+                ;
+            }
+
+            // advance a bit to LSB
+            bit = bit >> 1;
+        }
+        while(bit != 0x0);
+
+#endif
         
     }
     else

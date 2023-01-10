@@ -51,11 +51,8 @@
 #define IRDA_DIR P2DIR
 #define IRDA_SEL0 P2SEL0
 #define IRDA_SEL1 P2SEL1
-#define IRDA_OUT P2OUT
 
 
-
-#define F_CPU (1e6)
 
 
 #endif /* BOARD_H_ */

@@ -16,6 +16,8 @@
 #include "irphy.hpp"
 
 
+volatile uint32_t time_of = 0;
+
 const char str[13] = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
 
@@ -55,7 +57,12 @@ int main() {
   EN_IR_SMD_OUT |= EN_IR_SMD_PIN;
 
 
-
+#ifndef BITBANG
+  P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
+  P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
+#else
+  P2OUT |= IRDA_TX_PIN;
+#endif
 
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -63,7 +70,7 @@ int main() {
 
   // Startup clock system with max DCO setting ~8MHz
   CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
-  CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+  CSCTL1 = DCOFSEL_0 | DCORSEL;             // Set DCO to 1MHz
   CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
   CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
   CSCTL0_H = 0;                             // Lock CS registers
@@ -90,10 +97,11 @@ int main() {
                                             // to settle
 
 
-  // setup IRDA Pins
+  // setup Timer for time tracking
+  TA0CTL |= TACLR;
+  TA0CTL |= (0x2 << TASSEL0) | TAIE | MC__CONTINOUS;
 
-  P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
-  P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
+
 
 
 
@@ -217,3 +225,15 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12_ISR (void)
   }
 }
 
+
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void T0_A1_ISR(void)
+#elif defined(__GNUC__)
+void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) T0_A1_ISR (void)
+#else
+#error Compiler not supported!
+#endif
+{
+  time_of += (0x1 << 16);
+}
