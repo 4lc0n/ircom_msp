@@ -57,8 +57,12 @@ private:
     // methods for interfacing with the PHY
     // could also be moved to the PHY? nope?
     uint16_t calcualte_CRC(uint8_t* data, uint16_t length);
+
+    uint16_t add_control_escape(uint8_t* in_data, uint8_t* out_data, uint16_t length);
+
     
     bool receive_and_store();
+
 
     virtual void IrLAP_USERDATA_indication(uint8_t *userData, uint16_t length) = 0;
 

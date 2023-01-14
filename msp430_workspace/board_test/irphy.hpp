@@ -9,7 +9,14 @@
 
 #define BITBANG
 #define BITBANG_PULSE_US 19
+#define BITBANG_DELAY_PULSE __delay_cycles(19);
 #define BITBANG_PAUSE_US 85
+#define BITBANG_DELAY_PAUSE __delay_cycles(85);
+
+#define USE_REGULAR_UART        
+#define UART_PULSE_US 104
+#define UART_DELAY_PULSE __delay_cycles(104);
+
 
 class IrPHY : public IrPHY_Interface
 {
@@ -21,6 +28,13 @@ public:
 
     void init();
     void deinit();
+
+    /**
+     * @brief Set the receive callback object for receiving a frame, argument is number of bytes
+     * 
+     * @param callback 
+     */
+
 
     uint16_t send_frame(uint8_t *data, uint16_t len);
     
@@ -52,6 +66,7 @@ public:
     bool get_new_frame(uint8_t* frame, uint16_t &length);
 
 
+
 private:
     // TODO: maybe get rid of this
     uint8_t transfer_buffer[256] = {0};
@@ -75,11 +90,6 @@ private:
     enum receive_states {state_a, state_b, state_c, state_d} receive_state;
 
 
- 
-    uint16_t add_control_escape(uint8_t* in_data, uint8_t* out_data, uint16_t length);
-
-
-    
 
 
 };

@@ -97,9 +97,9 @@ void IrLAP_primary::tick(){
 
     // do some stuff in here
 
-    // check if frame available
+    // fetch the available frame
     if(receive_and_store()) {
-        // frame available: 
+        // frame available: is already transfered into wrapper_in
 
         // notify upper layer: 
         if(wrapper_in.frame.control == UI_CMD)  {
@@ -107,6 +107,8 @@ void IrLAP_primary::tick(){
         }
     }
 }
+
+
 
 
 
@@ -121,17 +123,17 @@ int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 {
 
     // construct the data frame
-    uint8_t data_buffer[64];
+    uint8_t data_buffer[100];
 
     data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
     data_buffer[1] = UI_CMD;        // send a UI frame
 
     // copy the userData into buffer
-    memcpy(data_buffer + 2, userData, length);
+    uint16_t total_length = add_control_escape(userData, data_buffer + 2, length) + 2;
 
     // call IrPHY function
 
-    int bytes_sent = irphy->send_frame(data_buffer, length+2);
+    int bytes_sent = irphy->send_frame(data_buffer, total_length);
 
     // free memory
     
@@ -174,11 +176,32 @@ bool IrLAP_primary::receive_and_store(){
     if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
     {
         // CRC-check failed
-        // TODO: do something :D
-
+        return false;
         
     }
 
     
     return true;
+}
+
+/**
+ * @brief function to add required control escape bytes to a frame
+ * 
+ * @param in_data pointer to input data
+ * @param out_data pointer to output data
+ * @param length length of input data
+ * @return uint16_t length of output data
+ */
+uint16_t IrLAP_primary::add_control_escape(uint8_t* in_data, uint8_t* out_data, uint16_t length) {
+    uint16_t out_len = 0;
+    for(uint16_t i = 0; i < length; i++) {
+        if(in_data[i] == IRLAP_BOF || in_data[i] == IRLAP_EOF || in_data[i] == IRLAP_CE) {
+            out_data[out_len++] = IRLAP_CE; 
+            out_data[out_len++] = (in_data[i] ^ 0x20);
+        }
+        else {
+            out_data[out_len++] = in_data[i];
+        }
+    }
+    return out_len;
 }

@@ -99,7 +99,7 @@ int main() {
 
   // setup Timer for time tracking
   TA0CTL |= TACLR;
-  TA0CTL |= (0x2 << TASSEL0) | TAIE | MC__CONTINOUS;
+  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS;
 
 
 
@@ -226,14 +226,29 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12_ISR (void)
 }
 
 
+// Timer0_A1 Interrupt Vector (TAIV) handler
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector=TIMER0_A1_VECTOR
-__interrupt void T0_A1_ISR(void)
+__interrupt void TIMER0_A1_ISR(void)
 #elif defined(__GNUC__)
-void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) T0_A1_ISR (void)
+void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) TIMER0_A1_ISR (void)
 #else
 #error Compiler not supported!
 #endif
 {
-  time_of += (0x1 << 16);
+  switch(__even_in_range(TA0IV, TA0IV_TAIFG))
+  {
+    case TA0IV_NONE:   break;               // No interrupt
+    case TA0IV_TACCR1: break;               // CCR1 not used
+    case TA0IV_TACCR2: break;               // CCR2 not used
+    case TA0IV_3:      break;               // reserved
+    case TA0IV_4:      break;               // reserved
+    case TA0IV_5:      break;               // reserved
+    case TA0IV_6:      break;               // reserved
+    case TA0IV_TAIFG:                       // overflow
+      time_of += 65536;
+      break;
+    default:          break;
+  }
+
 }

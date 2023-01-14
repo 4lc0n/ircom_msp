@@ -27,6 +27,7 @@ IrPHY::IrPHY()
  */
 void IrPHY::init()
 {
+ #ifndef BITBANG
     // initialize hardware
     // Configure USCI_A0 for UART mode
     UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
@@ -40,6 +41,7 @@ void IrPHY::init()
     UCA1BR1 = 0x00;
     UCA1MCTLW |= UCOS16; // | UCBRF_1;
 
+#ifndef USE_REGULAR_UART
     // enable IrDA encoding
     // pulse duration defined by UCIRTXPLx bits, specifying the number of one half clock periods of the clock selected by UCIRTXCLK
     // to set the pulse time to 3/16 bit period required by the IrDA standard, the BITCLK16 clock is selected with UCIRTXCLK=1 and the pulse length
@@ -51,7 +53,7 @@ void IrPHY::init()
     // set the minimum pulse length for receiving: 
     // set to pulse length at 115200 bit/s: 1.41 µs
     // calculation: tMIN = (UCIRRXFLx + 4) / [2 × fIRTXCLK]
-    
+#endif
 
     // uncomment the following line and see the result, the compiler will produce
     // for a  fIRTXCLK = SMCLK = 8MHz and 1.41µs = tMIN, result is 18
@@ -62,6 +64,17 @@ void IrPHY::init()
 
     UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
     UCA1IE |= UCRXIE | UCTXIFG;               // Enable USCI_A0 RX interrupt and TX interrupt (on transmit done)
+#else
+    IRDA_DIR |= (IRDA_TX_PIN);                  // set to normal pin function
+    IRDA_SEL0 &= ~(IRDA_TX_PIN);
+    IRDA_SEL1 &= ~(IRDA_TX_PIN);
+
+#ifdef USE_REGULAR_UART
+    IRDA_OUT |= (IRDA_TX_PIN);                  // set to idle high
+#else
+    IRDA_OUT &= ~(IRDA_TX_PIN);                 // set to idle low
+#endif
+#endif
 }
 
 /**
@@ -298,6 +311,9 @@ void IrPHY::put_received_data(uint8_t data)
             // set flag to data ready: set the amounts of bytes in the transfer buffer
             _data_bytes_ready = i;
 
+            // notify upper layer
+            // TODO
+
             
         }
         else{
@@ -366,42 +382,84 @@ void IrPHY::send_next_data()
         // send start
 
         uint32_t t = get_time();
+        uint32_t start_t = t;
+
+#ifdef USE_REGULAR_UART
+        IRDA_OUT &= ~(IRDA_TX_PIN);
+        
+        while(t < (start_t + UART_PULSE_US)) {
+            t = get_time();
+        }
+#else
         IRDA_OUT |= IRDA_TX_PIN;
 
-        while(t < (t + BITBANG_PULSE_US)) {
-            ;
+        while(t < (start_t + BITBANG_PULSE_US)) {
+            t = get_time();
         }
         IRDA_OUT &= ~IRDA_TX_PIN;
 
-        while(t < (t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
-            ;
+        while(t < (start_t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
+            t = get_time();
         }
+#endif
 
         uint8_t bit = 0x80;
         do {
-            
+            t = get_time();
+            start_t = t;
+#ifdef USE_REGULAR_UART
+            if(bit & d){
+                IRDA_OUT |= IRDA_TX_PIN;
+            }
+            else {
+                IRDA_OUT &= ~(IRDA_TX_PIN);
+            }
+            while(t < (start_t + UART_PULSE_US)) {
+                t = get_time();
+            }
+#else
             // if bit is a zero: send a pulse
             if(!(bit & d)) {
                 IRDA_OUT |= IRDA_TX_PIN;
             }
             
             // wait pulse length
-            while(t < (t + BITBANG_PULSE_US)) {
-                ;
+            while(t < (start_t + BITBANG_PULSE_US)) {
+                t = get_time();
             }
             // clear pulse
             IRDA_OUT &= ~IRDA_TX_PIN;
 
             // wait for pause
-            while(t < (t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
-                ;
+            while(t < (start_t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
+                t = get_time();
             }
+#endif
 
             // advance a bit to LSB
             bit = bit >> 1;
         }
         while(bit != 0x0);
 
+        // send stop bit
+        t = get_time();
+        start_t = t;
+
+#ifdef USE_REGULAR_UART
+        IRDA_OUT |= IRDA_TX_PIN;
+        while(t < (start_t + UART_PULSE_US)) {
+            t = get_time();
+        }
+#else
+        // wait for 1 pulse length, as stop bit is high --> is no pulse
+        while(t < (start_t + BITBANG_PAUSE_US + BITBANG_PAUSE_US)) {
+            t = get_time();
+        }
+#endif
+        // recursion: call until _is_transmitting is set to false; recursion stops
+        // delay:
+        __delay_cycles(2e3);
+        send_next_data();
 #endif
         
     }
