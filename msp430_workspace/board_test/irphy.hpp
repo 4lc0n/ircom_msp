@@ -7,15 +7,15 @@
 #include "irphy_interface.hpp"
 #include "irlap.hpp"
 
-#define BITBANG
+// #define BITBANG
 #define BITBANG_PULSE_US 19
-#define BITBANG_DELAY_PULSE __delay_cycles(19);
+#define BITBANG_DELAY_PULSE __delay_cycles(19)
 #define BITBANG_PAUSE_US 85
-#define BITBANG_DELAY_PAUSE __delay_cycles(85);
+#define BITBANG_DELAY_PAUSE __delay_cycles(85)
 
-#define USE_REGULAR_UART        
+// #define USE_REGULAR_UART
 #define UART_PULSE_US 104
-#define UART_DELAY_PULSE __delay_cycles(104);
+#define UART_DELAY_PULSE __delay_cycles(40)
 
 
 class IrPHY : public IrPHY_Interface

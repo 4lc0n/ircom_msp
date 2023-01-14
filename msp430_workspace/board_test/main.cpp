@@ -99,7 +99,7 @@ int main() {
 
   // setup Timer for time tracking
   TA0CTL |= TACLR;
-  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS;
+  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS ;
 
 
 

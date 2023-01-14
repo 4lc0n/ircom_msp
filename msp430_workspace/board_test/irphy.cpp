@@ -33,13 +33,21 @@ void IrPHY::init()
     UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
     UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
     // Baud Rate calculation
-    // 8000000/(16*9600) = 52.083
-    // Fractional portion = 0.083
-    // User's Guide Table 21-4: UCBRSx = 0x04
-    // UCBRFx = int ( (52.083-52)*16) = 1
-    UCA1BR0 = 52;                             // 8000000/16/9600
-    UCA1BR1 = 0x00;
-    UCA1MCTLW |= UCOS16; // | UCBRF_1;
+    // F_CLOCK = 1 MHz
+    // according to Table 30-5:
+    // UCOS16 = 1
+    // UCBRx = 6
+    // UCBRF = 8
+
+    // calculated:
+    // N = F_CLOCK / (BAUD (9600)) = 104.17
+    // FRAC = 0xAA (Table 30-4)
+    // As of oversampling: 
+    // UCBRx = INT(N) = 6
+    // UCBRFx = INT( [ (N/16) - INT(N/16) ] * 16) = 8
+    // UCBRSx = 0xAA
+    UCA1BRW = 6;
+    UCA1MCTLW = (0xAA << 8) | (UCBRF_8) | UCOS16; // | UCBRF_1;
 
 #ifndef USE_REGULAR_UART
     // enable IrDA encoding
@@ -387,20 +395,14 @@ void IrPHY::send_next_data()
 #ifdef USE_REGULAR_UART
         IRDA_OUT &= ~(IRDA_TX_PIN);
         
-        while(t < (start_t + UART_PULSE_US)) {
-            t = get_time();
-        }
+        UART_DELAY_PULSE;
 #else
         IRDA_OUT |= IRDA_TX_PIN;
 
-        while(t < (start_t + BITBANG_PULSE_US)) {
-            t = get_time();
-        }
+        BITBANG_DELAY_PULSE;
         IRDA_OUT &= ~IRDA_TX_PIN;
 
-        while(t < (start_t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
-            t = get_time();
-        }
+        BITBANG_DELAY_PAUSE;
 #endif
 
         uint8_t bit = 0x80;
@@ -414,9 +416,7 @@ void IrPHY::send_next_data()
             else {
                 IRDA_OUT &= ~(IRDA_TX_PIN);
             }
-            while(t < (start_t + UART_PULSE_US)) {
-                t = get_time();
-            }
+            UART_DELAY_PULSE;
 #else
             // if bit is a zero: send a pulse
             if(!(bit & d)) {
@@ -424,16 +424,12 @@ void IrPHY::send_next_data()
             }
             
             // wait pulse length
-            while(t < (start_t + BITBANG_PULSE_US)) {
-                t = get_time();
-            }
+            BITBANG_DELAY_PULSE;
             // clear pulse
             IRDA_OUT &= ~IRDA_TX_PIN;
 
             // wait for pause
-            while(t < (start_t + BITBANG_PULSE_US + BITBANG_PAUSE_US)) {
-                t = get_time();
-            }
+            BITBANG_DELAY_PAUSE;
 #endif
 
             // advance a bit to LSB
@@ -447,14 +443,11 @@ void IrPHY::send_next_data()
 
 #ifdef USE_REGULAR_UART
         IRDA_OUT |= IRDA_TX_PIN;
-        while(t < (start_t + UART_PULSE_US)) {
-            t = get_time();
-        }
+        UART_DELAY_PULSE;
 #else
         // wait for 1 pulse length, as stop bit is high --> is no pulse
-        while(t < (start_t + BITBANG_PAUSE_US + BITBANG_PAUSE_US)) {
-            t = get_time();
-        }
+        BITBANG_DELAY_PAUSE;
+        BITBANG_DELAY_PULSE;
 #endif
         // recursion: call until _is_transmitting is set to false; recursion stops
         // delay:
