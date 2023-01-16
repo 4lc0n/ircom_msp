@@ -1,7 +1,7 @@
 #ifndef IRPHY_HPP
 #define IRPHY_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include <ringbuffer.hpp>
 
 #include "irphy_interface.hpp"
@@ -41,10 +41,11 @@ public:
      * 
      * @param frame     frame pointer reference; will be set to address
      * @param length    length; will be set to number of bytes
-     * @return true     data is ready
-     * @return false    no data ready
+     * @return bool     bool value
+     * @retval true     data is ready
+     * @retval false    no data ready
      */
-    bool get_new_frame(uint8_t*& frame, uint16_t &length);
+    bool get_new_frame(uint8_t* frame, uint16_t &length);
 
 
 private:
@@ -52,8 +53,8 @@ private:
     uint8_t transfer_buffer[256] = {0};
 
 
-    char _input_buffer[255] = {0};
-    char _output_buffer[255] = {0};
+    char _input_buffer[100] = {0};
+    char _output_buffer[100] = {0};
     Ringbuffer<char> input_buffer;
     Ringbuffer<char> output_buffer;
 

@@ -3,25 +3,49 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
+CPP_SRCS += \
+../MicroTP.cpp \
+../irlap_primary.cpp \
+../irlap_secondary.cpp \
+../irphy.cpp \
+../main.cpp 
+
 CMD_SRCS += \
 ../lnk_msp430fr5948.cmd 
 
-C_SRCS += \
-../main.c 
-
-C_DEPS += \
-./main.d 
-
 OBJS += \
+./MicroTP.obj \
+./irlap_primary.obj \
+./irlap_secondary.obj \
+./irphy.obj \
 ./main.obj 
 
+CPP_DEPS += \
+./MicroTP.d \
+./irlap_primary.d \
+./irlap_secondary.d \
+./irphy.d \
+./main.d 
+
 OBJS__QUOTED += \
+"MicroTP.obj" \
+"irlap_primary.obj" \
+"irlap_secondary.obj" \
+"irphy.obj" \
 "main.obj" 
 
-C_DEPS__QUOTED += \
+CPP_DEPS__QUOTED += \
+"MicroTP.d" \
+"irlap_primary.d" \
+"irlap_secondary.d" \
+"irphy.d" \
 "main.d" 
 
-C_SRCS__QUOTED += \
-"../main.c" 
+CPP_SRCS__QUOTED += \
+"../MicroTP.cpp" \
+"../irlap_primary.cpp" \
+"../irlap_secondary.cpp" \
+"../irphy.cpp" \
+"../main.cpp" 
 
 

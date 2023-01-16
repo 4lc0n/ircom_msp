@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 
 #include <msp430fr5969.h>
 
@@ -316,7 +316,7 @@ void IrPHY::put_received_data(uint8_t data)
  * @return true     data is ready
  * @return false    no data ready
  */
-bool IrPHY::get_new_frame(uint8_t*& frame, uint16_t &length)
+bool IrPHY::get_new_frame(uint8_t* frame, uint16_t &length)
 {
     if(_data_bytes_ready == 0)
     {
@@ -343,7 +343,11 @@ void IrPHY::clear_intput_buffer()
 
 void IrPHY::send_next_data()
 {
-    _is_transmitting = true;
+    if(!_is_transmitting) {
+        
+        _is_transmitting = true;
+    }
+   
     if(!output_buffer.is_empty())
     {
         // send data
