@@ -202,10 +202,10 @@ int main() {
 }
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector=USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void)
+#pragma vector=USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void)
 #elif defined(__GNUC__)
-void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void)
+void __attribute__ ((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void)
 #else
 #error Compiler not supported!
 #endif
@@ -220,12 +220,13 @@ void __attribute__ ((interrupt(USCI_A0_VECTOR))) USCI_A0_ISR (void)
     case USCI_UART_UCTXIFG:
       // the last char was successfully transferred
       // send next data
-      // irPHY.send_next_data();
+      irPHY.send_next_data();
       break;
     case USCI_UART_UCSTTIFG: break;
     case USCI_UART_UCTXCPTIFG: break;
   }
 }
+
 
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
