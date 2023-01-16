@@ -69,6 +69,8 @@ IrPHY irPHY = {};
 
 const char* str = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
+volatile uint32_t time_of = 0;
+
 
 double internalSupplyVoltage = 0;
 double BattCellVoltage = 0;
@@ -145,6 +147,12 @@ int main() {
                                             // to settle
 
 
+
+  // initialize timer for time measuring
+    // setup Timer for time tracking
+  TA0CTL |= TACLR;
+  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS ;
+
   // setup IRDA Pins
 
   P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
@@ -153,33 +161,6 @@ int main() {
   // initialize the IR interface
   microTP.init(&irPHY);
 
-
-
-
-  // Configure USCI_A0 for UART mode
-  UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
-  UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
-  // Baud Rate calculation
-  // 8000000/(16*9600) = 52.083
-  // Fractional portion = 0.083
-  // User's Guide Table 21-4: UCBRSx = 0x04
-  // UCBRFx = int ( (52.083-52)*16) = 1
-  UCA1BR0 = 52;                             // 8000000/16/9600
-  UCA1BR1 = 0x00;
-  UCA1MCTLW |= UCOS16; // | UCBRF_1;
-
-  // enable IrDA encoding
-  // pulse duration defined by UCIRTXPLx bits, specifying the number of one half clock periods of the clock selected by UCIRTXCLK
-  // to set the pulse time to 3/16 bit period required by the IrDA standard, the BITCLK16 clock is selected with UCIRTXCLK=1 and the pulse length
-  // is set to six one-half clock cycles with UCIRTXPLx = 6-1 = 5
-
-  // set pulse length, enalbe BITCLK16, enable encoder/decoder
-  UCA1IRCTL |= (5 << 2) | (UCIRTXCLK) | (UCIREN);
-
-
-
-  UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
-  // UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt || not needed in hello world
 
 
   uint8_t i = 0;
@@ -305,4 +286,32 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12_ISR (void)
     case ADC12IV_ADC12RDYIFG: break;        // Vector 76:  ADC12RDY
     default: break;
   }
+}
+
+
+// Timer0_A1 Interrupt Vector (TAIV) handler
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void TIMER0_A1_ISR(void)
+#elif defined(__GNUC__)
+void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) TIMER0_A1_ISR (void)
+#else
+#error Compiler not supported!
+#endif
+{
+  switch(__even_in_range(TA0IV, TA0IV_TAIFG))
+  {
+    case TA0IV_NONE:   break;               // No interrupt
+    case TA0IV_TACCR1: break;               // CCR1 not used
+    case TA0IV_TACCR2: break;               // CCR2 not used
+    case TA0IV_3:      break;               // reserved
+    case TA0IV_4:      break;               // reserved
+    case TA0IV_5:      break;               // reserved
+    case TA0IV_6:      break;               // reserved
+    case TA0IV_TAIFG:                       // overflow
+      time_of += 65536;
+      break;
+    default:          break;
+  }
+
 }
