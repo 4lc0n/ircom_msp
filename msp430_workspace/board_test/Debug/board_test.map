@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker Unix v21.6.1                   
 ******************************************************************************
->> Linked Sat Jan 14 16:21:52 2023
+>> Linked Mon Jan 16 21:40:24 2023
 
 OUTPUT FILE NAME:   <board_test.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs_mpu"  address: 00005dd6

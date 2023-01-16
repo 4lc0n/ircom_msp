@@ -60,7 +60,7 @@
 #define IRDA_SEL0 P2SEL0
 #define IRDA_SEL1 P2SEL1
 
-
+#define F_CPU (8e6)
 
 
 
@@ -120,7 +120,7 @@ int main() {
 
     // Startup clock system with max DCO setting ~8MHz
     CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
-    CSCTL1 = DCOFSEL_0 | DCORSEL;             // Set DCO to 8MHz
+    CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
     CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
     CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
     CSCTL0_H = 0;                             // Lock CS registers
@@ -151,7 +151,7 @@ int main() {
   // initialize timer for time measuring
     // setup Timer for time tracking
   TA0CTL |= TACLR;
-  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS ;
+  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS | ID__8;
 
   // setup IRDA Pins
 
@@ -215,7 +215,7 @@ void __attribute__ ((interrupt(USCI_A1_VECTOR))) USCI_A1_ISR (void)
     case USCI_NONE: break;
     case USCI_UART_UCRXIFG:
       // insert received data
-      // irPHY.put_received_data(UCA1RXBUF);
+      irPHY.put_received_data(UCA1RXBUF);
       break;
     case USCI_UART_UCTXIFG:
       // the last char was successfully transferred
@@ -310,7 +310,7 @@ void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) TIMER0_A1_ISR (void)
     case TA0IV_5:      break;               // reserved
     case TA0IV_6:      break;               // reserved
     case TA0IV_TAIFG:                       // overflow
-      time_of += 65536;
+      time_of += 1000;
       break;
     default:          break;
   }

@@ -328,7 +328,7 @@ void IrPHY::put_received_data(uint8_t data)
 
             // notify upper layer
             // TODO
-
+            
             
         }
         else{
@@ -359,7 +359,7 @@ bool IrPHY::get_new_frame(uint8_t* frame, uint16_t &length)
     }
 
     length =  _data_bytes_ready;
-    frame = transfer_buffer;
+    memcpy(frame, transfer_buffer, _data_bytes_ready);
 
     // reset the data ready flag
     _data_bytes_ready = 0;

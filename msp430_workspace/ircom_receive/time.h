@@ -13,7 +13,7 @@ extern volatile uint32_t time_of;
  * @return uint32_t 
  */
 uint32_t get_time() {
-    return time_of + TA0R / 66; // get time in ms
+    return time_of + TA0R / 66;     // 
 }
 
 

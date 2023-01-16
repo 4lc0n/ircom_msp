@@ -1,4 +1,4 @@
-#include "irlap_primary.hpp"
+#include "irlap_secondary.hpp"
 #include "irphy.hpp"
 #include "irlap.hpp"
 #include "irphy_interface.hpp"
@@ -15,14 +15,14 @@
  * 
  * @param irphy irphy interface type
  */
-IrLAP_primary::IrLAP_primary()
+IrLAP_secondary::IrLAP_secondary()
 {
-    ;
+    
 }
 
-void IrLAP_primary::init(IrPHY *irphy){
+void IrLAP_secondary::init(IrPHY_Interface *irphy){
     this->irphy = irphy;
-    irphy->init();
+    this->irphy->init();
 
     // initialize the LAP layer
 
@@ -50,10 +50,16 @@ void IrLAP_primary::init(IrPHY *irphy){
  * @brief function to go into idle / sleep state
  * 
  */
-void IrLAP_primary::deinit(){
+void IrLAP_secondary::deinit(){
     irphy->deinit();
 
+
 }
+
+
+
+
+
 
 /**
  * @brief calculates the CRC16 sum over a given data block
@@ -62,7 +68,7 @@ void IrLAP_primary::deinit(){
  * @param length size in bytes of the data block
  * @return uint16_t 16 bit CRC checksum over the data block
  */
-uint16_t IrLAP_primary::calcualte_CRC(uint8_t* data, uint16_t length)
+uint16_t IrLAP_secondary::calcualte_CRC(uint8_t* data, uint16_t length)
 {
     int ii = 0;
 
@@ -89,82 +95,50 @@ uint16_t IrLAP_primary::calcualte_CRC(uint8_t* data, uint16_t length)
 #endif
 }
 
-/**
- * @brief tick function to be called periodically
- * 
- */
-void IrLAP_primary::tick(){ 
 
-    // do some stuff in here
 
-    // fetch the available frame
-    if(receive_and_store()) {
-        // frame available: is already transfered into wrapper_in
 
-        // notify upper layer: 
-        if(wrapper_in.frame.control == UI_CMD)  {
-            IrLAP_USERDATA_indication(wrapper_in.frame.information, 64);
-        }
+void IrLAP_secondary::tick(){
+
+    // check current state
+    if(current_state == OFFLINE){
+        // do nothing? 
     }
+    
+
+
+    if(new_frame_available){
+        // handle new frame
+        // crc check is done in handle_new_frame, as length is known at that stage
+
+        // determine frame content
+
+
+    }
+
+
 }
-
-
-
-
 
 /**
- * @brief function to send connectionless user data to a broadcast address
+ * @brief checks if a frame is available and if so, copies to wrapper_in
  * 
- * @param userData data to be sent
- * @param length length of data
- * @return int bytes pushed into send buffer
+ * @return true     frame was available and is stored
+ * @return false    no frame available or with wrong FCS
  */
-int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
-{
-
-    // construct the data frame
-    uint8_t data_buffer[100];
-    uint8_t send_buffer[100];
-
-    data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
-    data_buffer[1] = UI_CMD;        // send a UI frame
-    memcpy(data_buffer+2, userData, length);
-
-    uint16_t crc = calcualte_CRC(data_buffer, length + 2);
-    
-    data_buffer[length + 2] = (crc & 0xFF00) >> 8;
-    data_buffer[length + 3] = (crc & 0xFF);
-
-
-
-    // copy the userData into buffer
-    uint16_t total_length = add_control_escape(data_buffer, send_buffer, length + 4);
-
-    // call IrPHY function
-
-    int bytes_sent = irphy->send_frame(data_buffer, total_length);
-
-    // free memory
-    
-    return bytes_sent;
-}
-
-
-bool IrLAP_primary::receive_and_store(){
+bool IrLAP_secondary::receive_and_store(){
     uint16_t length;
-    // uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);
-    uint8_t data_wrapper[64];
+    uint8_t *data_wrapper = (uint8_t*)malloc(current_parameter.data_size.parameter * 64);   
 
     if( ! irphy->get_new_frame(data_wrapper, length)){
         // nothing available 
-        // free(data_wrapper);
+        free(data_wrapper);
         return false;
     }
 
 
     if(data_wrapper == 0 && length == 0){ 
         // not data available
-        // free(data_wrapper);
+        free(data_wrapper);
         return false;
     }
     // copy the incoming frame into the input wrapper
@@ -178,39 +152,48 @@ bool IrLAP_primary::receive_and_store(){
     memcpy((uint8_t*)(& wrapper_in.frame), (uint8_t*)(& (data_wrapper[1])), length - 4);
 
     // release memory 
-    // free(data_wrapper);
+    free(data_wrapper);
 
     // make crc check
     // check the CRC check
     if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
     {
         // CRC-check failed
+        // TODO: do something :D
+
         return false;
-        
     }
 
     
     return true;
 }
 
+
 /**
- * @brief function to add required control escape bytes to a frame
+ * @brief function to send connectionless user data to a broadcast address
  * 
- * @param in_data pointer to input data
- * @param out_data pointer to output data
- * @param length length of input data
- * @return uint16_t length of output data
+ * @param userData data to be sent
+ * @param length length of data
+ * @return int bytes sent
  */
-uint16_t IrLAP_primary::add_control_escape(uint8_t* in_data, uint8_t* out_data, uint16_t length) {
-    uint16_t out_len = 0;
-    for(uint16_t i = 0; i < length; i++) {
-        if(in_data[i] == IRLAP_BOF || in_data[i] == IRLAP_EOF || in_data[i] == IRLAP_CE) {
-            out_data[out_len++] = IRLAP_CE; 
-            out_data[out_len++] = (in_data[i] ^ 0x20);
-        }
-        else {
-            out_data[out_len++] = in_data[i];
-        }
-    }
-    return out_len;
+int IrLAP_secondary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
+{
+
+    // construct the data frame
+    uint8_t *data_buffer = (uint8_t*)malloc(length + 2);
+
+    data_buffer[0] = 0xFF;          // send to broadcast address and C/R set
+    data_buffer[1] = UI_CMD;        // send a UI frame
+
+    // copy the userData into buffer
+    memcpy(data_buffer + 2, userData, length);
+
+    // call IrPHY function
+
+    int bytes_sent = irphy->send_frame(data_buffer, length+2);
+
+    // free memory
+    free(data_buffer);
+    
+    return bytes_sent;
 }

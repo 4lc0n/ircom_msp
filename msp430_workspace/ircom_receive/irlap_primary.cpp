@@ -132,8 +132,8 @@ int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 
     uint16_t crc = calcualte_CRC(data_buffer, length + 2);
     
-    data_buffer[length + 2] = (crc & 0xFF00) >> 8;
-    data_buffer[length + 3] = (crc & 0xFF);
+    data_buffer[length + 3] = (crc & 0xFF00) >> 8;
+    data_buffer[length + 4] = (crc & 0xFF);
 
 
 
@@ -182,7 +182,7 @@ bool IrLAP_primary::receive_and_store(){
 
     // make crc check
     // check the CRC check
-    if (calcualte_CRC((uint8_t*)(& wrapper_in.frame), length-4) != wrapper_in.fcs)
+    if (calcualte_CRC((uint8_t*)(& (wrapper_in.frame)), length-4) != wrapper_in.fcs)
     {
         // CRC-check failed
         return false;
