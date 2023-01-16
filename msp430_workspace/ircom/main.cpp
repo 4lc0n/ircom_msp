@@ -109,7 +109,7 @@ int main() {
   EN_U_MEAS_OUT |= EN_U_MEAS_PIN;
 
   EN_IR_SMD_DIR |= EN_IR_SMD_PIN;
-  EN_IR_SMD_OUT |= EN_IR_SMD_PIN;
+  EN_IR_SMD_OUT &= ~(EN_IR_SMD_PIN);
 
 
 
@@ -120,7 +120,7 @@ int main() {
 
     // Startup clock system with max DCO setting ~8MHz
     CSCTL0_H = CSKEY >> 8;                    // Unlock clock registers
-    CSCTL1 = DCOFSEL_3 | DCORSEL;             // Set DCO to 8MHz
+    CSCTL1 = DCOFSEL_0 | DCORSEL;             // Set DCO to 8MHz
     CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
     CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;     // Set all dividers
     CSCTL0_H = 0;                             // Lock CS registers
