@@ -57,7 +57,11 @@
 
 
 #include "board.h"
+#include "MicroTP.h"
+#include "irphy.hpp"
 
+MicroTP microTP = {};
+IrPHY irPHY = {};
 
 const char* str = "Hello World\n";
 volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
@@ -76,7 +80,6 @@ int main() {
   WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
 
   // Configure GPIO
-<<<<<<< HEAD
   
   P1DIR = 0;
   P2DIR = 0;
@@ -103,8 +106,6 @@ int main() {
   EN_IR_SMD_OUT |= EN_IR_SMD_PIN;
 
 
-=======
->>>>>>> irda_dev
 
 
   // Disable the GPIO power-on default high-impedance mode to activate
@@ -145,12 +146,12 @@ int main() {
   P2SEL1 |= IRDA_RX_PIN | IRDA_TX_PIN;                    // USCI_A0 UART operation
   P2SEL0 &= ~(IRDA_RX_PIN | IRDA_TX_PIN);
 
+  // initialize the IR interface
+  microTP.init(&irPHY);
 
 
 
 
-
-<<<<<<< HEAD
   // Configure USCI_A0 for UART mode
   UCA1CTLW0 = UCSWRST;                      // Put eUSCI in reset
   UCA1CTLW0 |= UCSSEL__SMCLK;               // CLK = SMCLK
@@ -176,9 +177,6 @@ int main() {
   UCA1CTLW0 &= ~UCSWRST;                    // Initialize eUSCI
   // UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt || not needed in hello world
 
-=======
-  
->>>>>>> irda_dev
 
   uint8_t i = 0;
 
@@ -200,10 +198,8 @@ int main() {
 
 
     // send string to UART interface
+    microTP.send((uint8_t*)str, strlen(str));
 
-    for(i = 0; i < strlen(str); i++){
-
-    }
 
     // start ADC conversion
 
