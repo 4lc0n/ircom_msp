@@ -4,10 +4,16 @@
  * @return int 
  */
 
+#include <cstdlib>
+#include <ctype.h>
 #include <msp430.h>
-#include <stdint.h>
-#include <math.h>
+#include <cstdint>
+#include <cstring>
+#include <cmath>
 
+#include "board.h"
+#include "MicroTP.hpp"
+#include "irphy.hpp"
 
 
 // ====== GPIO OUTPUT CHANNELS ====== // 
@@ -56,9 +62,7 @@
 
 
 
-#include "board.h"
-#include "MicroTP.h"
-#include "irphy.hpp"
+
 
 MicroTP microTP = {};
 IrPHY irPHY = {};
