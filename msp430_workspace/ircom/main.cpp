@@ -4,6 +4,10 @@
  * @return int 
  */
 
+/*
+ Entrümpeln notwendig!
+ */
+
 #include <cstdlib>
 #include <ctype.h>
 #include <msp430.h>
@@ -68,18 +72,25 @@ MicroTP microTP = {};
 IrPHY irPHY = {};
 
 const char* str = "Hello World\n";
-volatile uint16_t adc_ntc_u, adc_ntc_sup, adc_batt_u, adc_vcc_u;
+//char SendStr[21];
+volatile uint16_t adc_ntc_sup, adc_batt_u, adc_vcc_u;
 volatile uint32_t time_of = 0;
+volatile uint32_t adc_ntc_u;
 
 
-double internalSupplyVoltage = 0;
-double BattCellVoltage = 0;
-double NTCSupplyVoltage = 0;
-double BattNTCTemperature = 0;
-double NTCVoltage = 0;
-double NTC_R = 0;
+float internalSupplyVoltage = 0;
+float BattCellVoltage = 0;
+float NTCSupplyVoltage = 0;
+float BattNTCTemperature = 0;
+float NTCVoltage = 0;
+float NTC_R = 0;
 
+uint16_t cwVolt = 0;
+uint32_t cwTemp = 0;
+uint64_t SendData = 0;
 
+//Address
+uint32_t DeviceAddress = *((uint32_t*)(0x01A30));
 
 int main() {
 
@@ -169,7 +180,7 @@ int main() {
   {
     
 
-     // calc internal supply voltage ÂµC
+     // calc internal supply voltage µC
       internalSupplyVoltage = adc_vcc_u / 4096.0 * 2.8 * 2;              // 2.8 = Vref = VCC
 
      // calc battery cell voltage
@@ -181,10 +192,15 @@ int main() {
       NTC_R = (-NTCVoltage * 1000.0) / (NTCVoltage - NTCSupplyVoltage);                 // calc NTC resistent
       BattNTCTemperature = 1 / ((1/3977.0) * log(NTC_R/2700.0) + (1/298.0)) -273.15;    // calc temperature
 
-
+    // build data
+      cwVolt = adc_batt_u;
+      cwTemp = adc_ntc_u*10000;
+      SendData = DeviceAddress;
+      SendData = SendData*1000000000;
+      SendData = SendData+cwTemp+cwVolt;
     // send string to UART interface
-    microTP.send((uint8_t*)str, strlen(str));
-
+    //microTP.send((uint8_t*)str, strlen(str));
+    microTP.send((uint8_t*)SendData, sizeof(SendData));
 
     // start ADC conversion
 
