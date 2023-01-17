@@ -36,6 +36,17 @@ IrPHY irPHY = {};
 const char* str = "Hello World\n";
 
 volatile uint32_t time_of = 0;
+volatile uint64_t ReceivedData = 0;
+volatile uint64_t DeviceAddress = 0;
+volatile uint16_t cwBatVolt;
+volatile uint32_t cwNtcSup;
+volatile uint64_t cwNtcVolt;
+
+float BattCellVoltage = 0;
+float NTCVoltage = 0;
+float NTC_R = 0;
+float NTCSupplyVoltage = 0;
+float BattNTCTemperature = 0;
 
 void sendn_uart(uint8_t* data, uint16_t length) {
   for(uint16_t i = 0; i < length; i++){
@@ -148,6 +159,35 @@ int main() {
       microTP.tick();
       if(microTP.receive((uint8_t*)input_buffer, &input_length) == 0) {
         sendn_uart((uint8_t*)input_buffer, input_length);
+        /*
+         cwBatVolt = adc_batt_u;
+      cwNtcSup = adc_ntc_sup*10000;
+      cwNtcVolt = adc_ntc_u*100000000;
+
+      SendAddr = DeviceAddress;
+      SendAddr = SendAddr - SendAddr%1000000000000;
+      SendData = SendAddr+cwNtcVolt+cwNtcSup+cwBatVolt;
+         */
+
+      //disassemble received data
+      DeviceAddress = ReceivedData/1000000000000;
+      ReceivedData = ReceivedData - DeviceAddress*1000000000000;
+      cwNtcVolt = ReceivedData/100000000;
+      ReceivedData = ReceivedData - cwNtcVolt*100000000;
+      cwNtcSup = ReceivedData/10000;
+      ReceivedData = ReceivedData - cwNtcSup*10000;
+      cwBatVolt = ReceivedData;
+      ReceivedData = ReceivedData -cwBatVolt;
+
+      // calc battery cell voltage
+      BattCellVoltage = cwBatVolt / 4096.0 * 2.8 / 1.44 + 2.2;          // 1.44 = opv gain 2.2 = z-diode
+
+      // calc battery cell temperature
+      NTCSupplyVoltage = cwNtcSup / 4096.0 * 2.8;                                    // check ntc supply voltage with 2.8 V reference
+      NTCVoltage = cwNtcVolt/4096.0 * 2.8;                                              // check ntc voltage with 2.8 V reference
+      NTC_R = (-NTCVoltage * 1000.0) / (NTCVoltage - NTCSupplyVoltage);                 // calc NTC resistent
+      BattNTCTemperature = 1 / ((1/3977.0) * log(NTC_R/2700.0) + (1/298.0)) -273.15;    // calc temperature
+
       }
 
 
