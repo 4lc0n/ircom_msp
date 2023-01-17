@@ -73,9 +73,11 @@ IrPHY irPHY = {};
 
 const char* str = "Hello World\n";
 //char SendStr[21];
-volatile uint16_t adc_ntc_sup, adc_batt_u, adc_vcc_u;
+volatile uint16_t  adc_batt_u, adc_vcc_u;
 volatile uint32_t time_of = 0;
-volatile uint32_t adc_ntc_u;
+volatile uint32_t adc_ntc_sup;
+volatile uint64_t adc_ntc_u;
+volatile uint64_t SendAddr;
 
 
 float internalSupplyVoltage = 0;
@@ -85,12 +87,14 @@ float BattNTCTemperature = 0;
 float NTCVoltage = 0;
 float NTC_R = 0;
 
-uint16_t cwVolt = 0;
-uint32_t cwTemp = 0;
+uint16_t cwBatVolt = 0;
+uint32_t cwNtcSup = 0;
+uint64_t cwNtcVolt = 0;
 uint64_t SendData = 0;
 
+
 //Address
-uint32_t DeviceAddress = *((uint32_t*)(0x01A30));
+uint64_t DeviceAddress = *((uint64_t*)(0x01A30));
 
 int main() {
 
@@ -179,7 +183,7 @@ int main() {
   while (1)
   {
     
-
+     /*
      // calc internal supply voltage µC
       internalSupplyVoltage = adc_vcc_u / 4096.0 * 2.8 * 2;              // 2.8 = Vref = VCC
 
@@ -191,13 +195,15 @@ int main() {
       NTCVoltage = adc_ntc_u/4096.0 * 2.8;                                              // check ntc voltage with 2.8 V reference
       NTC_R = (-NTCVoltage * 1000.0) / (NTCVoltage - NTCSupplyVoltage);                 // calc NTC resistent
       BattNTCTemperature = 1 / ((1/3977.0) * log(NTC_R/2700.0) + (1/298.0)) -273.15;    // calc temperature
-
+      */
     // build data
-      cwVolt = adc_batt_u;
-      cwTemp = adc_ntc_u*10000;
-      SendData = DeviceAddress;
-      SendData = SendData*1000000000;
-      SendData = SendData+cwTemp+cwVolt;
+      cwBatVolt = adc_batt_u;
+      cwNtcSup = adc_ntc_sup*10000;
+      cwNtcVolt = adc_ntc_u*100000000;
+
+      SendAddr = DeviceAddress;
+      SendAddr = SendAddr - SendAddr%1000000000000;
+      SendData = SendAddr+cwNtcVolt+cwNtcSup+cwBatVolt;
     // send string to UART interface
     //microTP.send((uint8_t*)str, strlen(str));
     microTP.send((uint8_t*)SendData, sizeof(SendData));
