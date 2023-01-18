@@ -111,7 +111,7 @@ int main() {
   P4OUT = 0;
   PJOUT = 0;
 
-
+  P4DIR |= (BIT6);      // LED
   
 
   // Disable the GPIO power-on default high-impedance mode to activate
@@ -159,6 +159,11 @@ int main() {
   while(1) {
       microTP.tick();
       if(microTP.receive((uint8_t*)input_buffer, &input_length) == 0) {
+
+
+          // set led:
+          P4OUT |= (BIT6);
+
 //        if(input_length == sizeof(ReceivedData)) {
             ReceivedData = (uint64_t)input_buffer[0];
 //        }
@@ -193,9 +198,12 @@ int main() {
 
         char transmit_buffer[64]; 
 
-        sprintf(transmit_buffer, "dev: %ull, bat: %e, sup: %e, temp: %e", DeviceAddress, BattCellVoltage, NTCSupplyVoltage, BattNTCTemperature);
+        sprintf(transmit_buffer, "dev: %llu, bat: %.3f, sup: %.3f, temp: %.3f\n", DeviceAddress, BattCellVoltage, NTCSupplyVoltage, BattNTCTemperature);
 
         sendn_uart((uint8_t*)transmit_buffer, strlen(transmit_buffer));
+
+        P4OUT &= ~(BIT6);
+
       }
 
 

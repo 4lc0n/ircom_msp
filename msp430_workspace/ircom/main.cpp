@@ -166,7 +166,9 @@ int main() {
   // initialize timer for time measuring
     // setup Timer for time tracking
   TA0CTL |= TACLR;
-  TA0CTL |= (TASSEL__SMCLK) | TAIE | MC__CONTINOUS | ID__8;
+  TA0CTL |= (TASSEL__ACLK) | MC__CONTINOUS | ID__1;
+  TA0CCR0 = 10000;
+  TA0CCTL0 |= CCIE;
 
   // setup IRDA Pins
 
