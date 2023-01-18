@@ -213,14 +213,12 @@ int main() {
     ADC12CTL0 |= ADC12ENC | ADC12SC;         // Sampling and conversion start
 
 
-    __delay_cycles(8e6);
+    //__delay_cycles(40e6);                   //8e6 = 1s; 40e6==5s
 
-    __bis_SR_register(GIE);
+    __bis_SR_register(LPM3_bits | GIE);       // Enter LPM3, interrupts enabled
+    __no_operation();                         // For debugger
+
   }
-
-
-  // __bis_SR_register(LPM3_bits | GIE);       // Enter LPM3, interrupts enabled
-  // __no_operation();                         // For debugger
 }
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
@@ -333,6 +331,7 @@ void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) TIMER0_A1_ISR (void)
     case TA0IV_6:      break;               // reserved
     case TA0IV_TAIFG:                       // overflow
       time_of += 1000;
+      __bic_SR_register_on_exit(LPM3_bits);
       break;
     default:          break;
   }
