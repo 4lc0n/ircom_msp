@@ -166,7 +166,7 @@ int main() {
   // initialize timer for time measuring
     // setup Timer for time tracking
   TA0CTL |= TACLR;
-  TA0CTL |= (TASSEL__ACLK) | MC__CONTINOUS | ID__1;
+  TA0CTL |= (TASSEL__ACLK) | MC__UP | ID__1;
   TA0CCR0 = 10000;
   TA0CCTL0 |= CCIE;
 
@@ -314,10 +314,10 @@ void __attribute__ ((interrupt(ADC12_VECTOR))) ADC12_ISR (void)
 
 // Timer0_A1 Interrupt Vector (TAIV) handler
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector=TIMER0_A1_VECTOR
-__interrupt void TIMER0_A1_ISR(void)
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void TIMER0_A0_ISR(void)
 #elif defined(__GNUC__)
-void __attribute__ ((interrupt(TIMER0_A1_VECTOR))) TIMER0_A1_ISR (void)
+void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) TIMER0_A0_ISR (void)
 #else
 #error Compiler not supported!
 #endif
