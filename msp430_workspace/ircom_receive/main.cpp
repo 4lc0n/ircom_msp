@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cmath>
+#include <cstdio>
 
 #include "board.h"
 #include "MicroTP.hpp"
@@ -150,7 +151,7 @@ int main() {
 
   send_uart("setup complete\n");
 
-  char input_buffer[64];
+  uint64_t input_buffer[10];
   uint16_t input_length = 0;
 
   __bis_SR_register(GIE);       // Enter LPM3, interrupts enabled
@@ -158,7 +159,9 @@ int main() {
   while(1) {
       microTP.tick();
       if(microTP.receive((uint8_t*)input_buffer, &input_length) == 0) {
-        sendn_uart((uint8_t*)input_buffer, input_length);
+//        if(input_length == sizeof(ReceivedData)) {
+            ReceivedData = (uint64_t)input_buffer[0];
+//        }
         /*
          cwBatVolt = adc_batt_u;
       cwNtcSup = adc_ntc_sup*10000;
@@ -188,6 +191,11 @@ int main() {
       NTC_R = (-NTCVoltage * 1000.0) / (NTCVoltage - NTCSupplyVoltage);                 // calc NTC resistent
       BattNTCTemperature = 1 / ((1/3977.0) * log(NTC_R/2700.0) + (1/298.0)) -273.15;    // calc temperature
 
+        char transmit_buffer[64]; 
+
+        sprintf(transmit_buffer, "dev: %ull, bat: %e, sup: %e, temp: %e", DeviceAddress, BattCellVoltage, NTCSupplyVoltage, BattNTCTemperature);
+
+        sendn_uart((uint8_t*)transmit_buffer, strlen(transmit_buffer));
       }
 
 
