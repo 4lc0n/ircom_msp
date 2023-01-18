@@ -5,7 +5,7 @@
  */
 
 /*
- Entrümpeln notwendig!
+ Entrï¿½mpeln notwendig!
  */
 
 #include <cstdlib>
@@ -184,7 +184,7 @@ int main() {
   {
     
      /*
-     // calc internal supply voltage µC
+     // calc internal supply voltage ï¿½C
       internalSupplyVoltage = adc_vcc_u / 4096.0 * 2.8 * 2;              // 2.8 = Vref = VCC
 
      // calc battery cell voltage
@@ -206,7 +206,7 @@ int main() {
       SendData = SendAddr+cwNtcVolt+cwNtcSup+cwBatVolt;
     // send string to UART interface
     //microTP.send((uint8_t*)str, strlen(str));
-    microTP.send((uint8_t*)SendData, sizeof(SendData));
+    microTP.send((uint8_t*)&SendData, sizeof(SendData));
 
     // start ADC conversion
 
