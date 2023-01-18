@@ -322,20 +322,10 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) TIMER0_A0_ISR (void)
 #error Compiler not supported!
 #endif
 {
-  switch(__even_in_range(TA0IV, TA0IV_TAIFG))
-  {
-    case TA0IV_NONE:   break;               // No interrupt
-    case TA0IV_TACCR1: break;               // CCR1 not used
-    case TA0IV_TACCR2: break;               // CCR2 not used
-    case TA0IV_3:      break;               // reserved
-    case TA0IV_4:      break;               // reserved
-    case TA0IV_5:      break;               // reserved
-    case TA0IV_6:      break;               // reserved
-    case TA0IV_TAIFG:                       // overflow
-      time_of += 1000;
-      __bic_SR_register_on_exit(LPM3_bits);
-      break;
-    default:          break;
-  }
+  
+    time_of += 1000;
+    __bic_SR_register_on_exit(LPM3_bits);
+      
+  
 
 }
