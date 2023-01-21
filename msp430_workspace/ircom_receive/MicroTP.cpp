@@ -80,9 +80,10 @@ int MicroTP::receive(uint8_t* data, uint16_t* length) {
     
     // check if a packet is available
     if(packet_available != 0) {
-        memcpy(data, buffer_in, packet_available);
         *length = packet_available;
         packet_available = 0;
+
+        memcpy(data, buffer_in, packet_available);        
         return 0;
     }
 

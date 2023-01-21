@@ -121,7 +121,7 @@ void IrLAP_primary::tick(){
  */
 int IrLAP_primary::IrLAP_USERDATA_request(uint8_t *userData, uint16_t length)
 {
-
+    // TODO: use data wrapper!
     // construct the data frame
     uint8_t data_buffer[100];
     uint8_t send_buffer[100];

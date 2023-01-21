@@ -157,12 +157,15 @@ int main() {
   __bis_SR_register(GIE);       // Enter LPM3, interrupts enabled
 
   while(1) {
+      P4OUT |= (BIT6);
       microTP.tick();
+      P4OUT &= ~(BIT6);
+
       if(microTP.receive((uint8_t*)input_buffer, &input_length) == 0) {
 
 
           // set led:
-          P4OUT |= (BIT6);
+          
 
 //        if(input_length == sizeof(ReceivedData)) {
             ReceivedData = (uint64_t)input_buffer[0];
@@ -202,7 +205,6 @@ int main() {
 
         sendn_uart((uint8_t*)transmit_buffer, strlen(transmit_buffer));
 
-        P4OUT &= ~(BIT6);
 
       }
 
